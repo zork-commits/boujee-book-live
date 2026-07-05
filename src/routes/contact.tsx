@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { WebNav } from "@/components/groom/WebNav";
-import { WebFooter } from "@/components/groom/WebFooter";
+import { WebNav } from "@/components/boujee/WebNav";
+import { WebFooter } from "@/components/boujee/WebFooter";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({ meta: [{ title: "Contact — GROOM™" }] }),
+  head: () => ({ meta: [{ title: "Contact — Boujee Book™" }] }),
   component: Contact,
 });
 
@@ -34,10 +34,10 @@ function Contact() {
           </form>
           <div className="space-y-8">
             {[
-              ["Press","press@groom.app"],
-              ["Investors","ir@groom.app"],
-              ["Partnerships","partners@groom.app"],
-              ["Support","help@groom.app"],
+              ["Press","press@boujeebook.app"],
+              ["Investors","ir@boujeebook.app"],
+              ["Partnerships","partners@boujeebook.app"],
+              ["Support","help@boujeebook.app"],
               ["HQ","68 Jay Street, Brooklyn NY 11201"],
             ].map(([l,v])=>(
               <div key={l}>

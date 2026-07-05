@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/groom/AppShell";
-import { ProTabs } from "@/components/groom/ProTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { ProTabs } from "@/components/boujee/ProTabs";
 import { PRO_CLIENTS } from "@/lib/mock";
 import { Search, MessageSquare, Plus } from "lucide-react";
 

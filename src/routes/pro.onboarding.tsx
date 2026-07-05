@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { AppShell } from "@/components/groom/AppShell";
-import { ProTabs } from "@/components/groom/ProTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { ProTabs } from "@/components/boujee/ProTabs";
 import { Check, Upload, ShieldCheck, IdCard, Sparkles, Scissors } from "lucide-react";
 
 export const Route = createFileRoute("/pro/onboarding")({
-  head: () => ({ meta: [{ title: "Become a Pro — GROOM" }] }),
+  head: () => ({ meta: [{ title: "Become a Pro — Boujee Book" }] }),
   component: Onboarding,
 });
 
@@ -79,7 +79,7 @@ function Onboarding() {
               <p className="text-xs text-white/60 mt-2">I will use new, sealed, or hospital-grade disinfected tools at every appointment. I will never use reused, unsafe, or unsanitized supplies.</p>
               <label className="mt-3 flex items-start gap-2 text-xs">
                 <input type="checkbox" checked={agreed} onChange={e=>setAgreed(e.target.checked)} className="mt-0.5" />
-                <span>I agree to the GROOM™ Sanitation Standard and Pro Code of Conduct.</span>
+                <span>I agree to the Boujee Book™ Sanitation Standard and Pro Code of Conduct.</span>
               </label>
             </div>
           </>)}

@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { AppShell } from "@/components/groom/AppShell";
-import { AppTabs } from "@/components/groom/AppTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { AppTabs } from "@/components/boujee/AppTabs";
 import { PROS } from "@/lib/mock";
 import { Send, ChevronLeft, Phone, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/app/messages")({
-  head: () => ({ meta: [{ title: "Messages — GROOM" }] }),
+  head: () => ({ meta: [{ title: "Messages — Boujee Book" }] }),
   component: Messages,
 });
 

@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell } from "@/components/groom/AppShell";
-import { AppTabs } from "@/components/groom/AppTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { AppTabs } from "@/components/boujee/AppTabs";
 import { ShieldCheck, BadgeCheck, Sparkles, Flag, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/app/safety")({
-  head: () => ({ meta: [{ title: "Trust & Safety — GROOM" }] }),
+  head: () => ({ meta: [{ title: "Trust & Safety — Boujee Book" }] }),
   component: Safety,
 });
 

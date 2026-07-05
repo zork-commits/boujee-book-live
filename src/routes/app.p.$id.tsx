@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { AppShell } from "@/components/groom/AppShell";
+import { AppShell } from "@/components/boujee/AppShell";
 import { PROS, type Pro } from "@/lib/mock";
 import { ChevronLeft, Star, MapPin, BadgeCheck, MessageSquare, Heart, Share2, Award } from "lucide-react";
 

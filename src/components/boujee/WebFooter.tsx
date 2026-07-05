@@ -5,7 +5,7 @@ export function WebFooter() {
     <footer className="bg-ink text-white/70">
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid gap-10 md:grid-cols-5">
         <div className="md:col-span-2">
-          <div className="font-display text-3xl tracking-[0.25em] text-white">GROOM<sup className="text-xs tracking-normal text-gold">™</sup></div>
+          <div className="font-display text-3xl tracking-[0.25em] text-white">BOUJEE BOOK<sup className="text-xs tracking-normal text-gold">™</sup></div>
           <p className="mt-4 text-sm max-w-xs">The Operating System for Personal Care. Track them. Book them. Love them.™</p>
         </div>
         <div>
@@ -34,7 +34,7 @@ export function WebFooter() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 py-6 text-center text-xs text-white/40">© {new Date().getFullYear()} GROOM Technologies, Inc. All rights reserved.</div>
+      <div className="border-t border-white/10 py-6 text-center text-xs text-white/40">© {new Date().getFullYear()} Boujee Book Technologies, Inc. All rights reserved.</div>
     </footer>
   );
 }

@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sparkline, Bars } from "@/components/groom/Sparkline";
+import { Sparkline, Bars } from "@/components/boujee/Sparkline";
 import { INVESTOR, ADMIN_KPI } from "@/lib/mock";
 import { Lock, Download, ArrowUpRight, TrendingUp } from "lucide-react";
 
 export const Route = createFileRoute("/investors")({
-  head: () => ({ meta: [{ title: "Investors — GROOM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Investors — Boujee Book" }, { name: "robots", content: "noindex" }] }),
   component: Investors,
 });
 
@@ -12,7 +12,7 @@ function Investors() {
   return (
     <div className="min-h-screen bg-ink text-white">
       <header className="border-b border-white/10 px-6 lg:px-12 py-5 flex items-center justify-between">
-        <Link to="/" className="font-display text-xl tracking-[0.25em] text-gold">GROOM<sup className="text-[9px] tracking-normal opacity-60">™</sup></Link>
+        <Link to="/" className="font-display text-xl tracking-[0.25em] text-gold">BOUJEE BOOK<sup className="text-[9px] tracking-normal opacity-60">™</sup></Link>
         <div className="hidden md:flex items-center gap-2 text-[10px] uppercase tracking-widest text-white/40"><Lock className="h-3 w-3" />Confidential · For investors only</div>
         <button className="text-xs px-4 py-2 rounded-full border border-white/20 inline-flex items-center gap-1.5"><Download className="h-3 w-3" />Deck</button>
       </header>
@@ -20,7 +20,7 @@ function Investors() {
       <section className="px-6 lg:px-12 pt-12 pb-8">
         <div className="text-[10px] tracking-[0.4em] text-gold uppercase mb-4">Series A · Confidential</div>
         <h1 className="font-display text-5xl lg:text-7xl">Building the OS for a <em className="text-gold not-italic">$480B</em> industry.</h1>
-        <p className="mt-4 text-white/60 max-w-2xl">GROOM is the booking, payments, and CRM layer for the global personal care economy.</p>
+        <p className="mt-4 text-white/60 max-w-2xl">Boujee Book is the booking, payments, and CRM layer for the global personal care economy.</p>
       </section>
 
       <section className="px-6 lg:px-12 grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -116,12 +116,12 @@ function Investors() {
             <div className="font-display text-5xl lg:text-6xl mt-2">$40M Series B</div>
             <div className="mt-2 text-sm">Led by undisclosed · 18-month runway extension to $80M ARR</div>
           </div>
-          <a href="mailto:ir@groom.app" className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-ink text-white text-sm font-medium">Request data room <ArrowUpRight className="h-4 w-4" /></a>
+          <a href="mailto:ir@boujeebook.app" className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-ink text-white text-sm font-medium">Request data room <ArrowUpRight className="h-4 w-4" /></a>
         </div>
       </section>
 
       <footer className="border-t border-white/10 px-6 lg:px-12 py-6 text-[11px] text-white/40 flex justify-between">
-        <span>© 2026 GROOM Technologies, Inc.</span>
+        <span>© 2026 Boujee Book Technologies, Inc.</span>
         <span>All figures are demonstration data.</span>
       </footer>
     </div>

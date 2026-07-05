@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { WebNav } from "@/components/groom/WebNav";
-import { WebFooter } from "@/components/groom/WebFooter";
+import { WebNav } from "@/components/boujee/WebNav";
+import { WebFooter } from "@/components/boujee/WebFooter";
 import { CATEGORIES } from "@/lib/mock";
 
 export const Route = createFileRoute("/services")({
-  head: () => ({ meta: [{ title: "Services — GROOM™" }, { name: "description", content: "Barbers, hairstylists, nails, makeup, lashes, esthetics, massage." }] }),
+  head: () => ({ meta: [{ title: "Services — Boujee Book™" }, { name: "description", content: "Barbers, hairstylists, nails, makeup, lashes, esthetics, massage." }] }),
   component: Services,
 });
 

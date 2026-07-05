@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell } from "@/components/groom/AppShell";
-import { AppTabs } from "@/components/groom/AppTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { AppTabs } from "@/components/boujee/AppTabs";
 import { FAVORITES } from "@/lib/mock";
 import { CreditCard, Bell, Heart, Gift, Settings, ChevronRight, Star, LogOut, MapPin, Shield, Crown, ShieldCheck } from "lucide-react";
 
@@ -15,7 +15,7 @@ function Me() {
         <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-gold/40 to-gold/10 grid place-items-center font-display text-2xl">MR</div>
         <div className="flex-1 min-w-0">
           <div className="font-display text-2xl">Maya Rivera</div>
-          <div className="text-xs text-muted-foreground">maya@groom.app</div>
+          <div className="text-xs text-muted-foreground">maya@boujeebook.app</div>
           <div className="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gold/20 text-[10px] uppercase tracking-widest"><Star className="h-2.5 w-2.5 fill-gold text-gold" />Elite Member</div>
         </div>
       </header>

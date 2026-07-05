@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useLocation } from "@tanstack/react-router";
 import { useState } from "react";
-import { Sparkline } from "@/components/groom/Sparkline";
+import { Sparkline } from "@/components/boujee/Sparkline";
 import { ADMIN_KPI, PENDING_PROS, DISPUTES, PROS } from "@/lib/mock";
 import { LayoutDashboard, ShieldCheck, Users, AlertTriangle, BarChart3, Search, Check, X, ChevronDown, Calendar, CreditCard, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin — GROOM" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin — Boujee Book" }, { name: "robots", content: "noindex" }] }),
   component: Admin,
 });
 
@@ -25,7 +25,7 @@ function Admin() {
   return (
     <div className="min-h-screen bg-cream flex">
       <aside className="hidden md:flex flex-col w-60 bg-ink text-white p-5 sticky top-0 h-screen">
-        <Link to="/" className="font-display text-xl tracking-[0.25em] text-gold">GROOM<sup className="text-[9px] tracking-normal opacity-60">™</sup></Link>
+        <Link to="/" className="font-display text-xl tracking-[0.25em] text-gold">BOUJEE BOOK<sup className="text-[9px] tracking-normal opacity-60">™</sup></Link>
         <div className="text-[10px] uppercase tracking-widest text-white/40 mt-1">Admin Console</div>
         <nav className="mt-8 space-y-1 flex-1">
           {NAV.map(n=>{const I=n.i;return(
@@ -149,7 +149,7 @@ function ProsTab() {
 }
 
 function UsersTab() {
-  const rows = Array.from({length:8}).map((_,i)=>({n:["Maya R.","James T.","Eli C.","Priya S.","Devon H.","Kira P.","Ren A.","Owen B."][i], e:"user@groom.app", s:[12,4,18,2,7,22,3,9][i], lv:["Elite","Free","Elite","Free","Free","Elite","Free","Elite"][i]}));
+  const rows = Array.from({length:8}).map((_,i)=>({n:["Maya R.","James T.","Eli C.","Priya S.","Devon H.","Kira P.","Ren A.","Owen B."][i], e:"user@boujeebook.app", s:[12,4,18,2,7,22,3,9][i], lv:["Elite","Free","Elite","Free","Free","Elite","Free","Elite"][i]}));
   return (
     <div>
       <h1 className="font-display text-3xl">Users</h1>

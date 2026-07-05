@@ -17,7 +17,7 @@ export function WebNav({ dark = false }: { dark?: boolean }) {
   return (
     <header className={`absolute top-0 inset-x-0 z-40 ${tx}`}>
       <div className="mx-auto max-w-7xl px-6 lg:px-10 flex items-center justify-between py-6">
-        <Link to="/" className="font-display text-2xl tracking-[0.25em]">GROOM<sup className="text-[10px] tracking-normal opacity-60">™</sup></Link>
+        <Link to="/" className="font-display text-2xl tracking-[0.25em]">BOUJEE BOOK<sup className="text-[10px] tracking-normal opacity-60">™</sup></Link>
         <nav className="hidden md:flex items-center gap-8 text-sm">
           {LINKS.map(l => (
             <Link key={l.to} to={l.to} className="opacity-80 hover:opacity-100 transition-opacity">{l.label}</Link>

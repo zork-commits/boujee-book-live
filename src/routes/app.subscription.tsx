@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { AppShell } from "@/components/groom/AppShell";
-import { AppTabs } from "@/components/groom/AppTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { AppTabs } from "@/components/boujee/AppTabs";
 import { Check, Crown, ChevronLeft, CreditCard, Apple } from "lucide-react";
 
 export const Route = createFileRoute("/app/subscription")({
-  head: () => ({ meta: [{ title: "Subscription — GROOM" }] }),
+  head: () => ({ meta: [{ title: "Subscription — Boujee Book" }] }),
   component: Subscription,
 });
 

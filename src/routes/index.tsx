@@ -1,15 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { WebNav } from "@/components/groom/WebNav";
-import { WebFooter } from "@/components/groom/WebFooter";
+import { WebNav } from "@/components/boujee/WebNav";
+import { WebFooter } from "@/components/boujee/WebFooter";
 import { PROS, CATEGORIES } from "@/lib/mock";
 import { ArrowRight, Star, Shield, Sparkles, MapPin, Clock, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GROOM™ — The Operating System for Personal Care" },
+      { title: "Boujee Book™ — The Operating System for Personal Care" },
       { name: "description", content: "Book trusted beauty and wellness professionals in minutes. Barbers, hairstylists, nails, makeup, lashes, esthetics, massage." },
-      { property: "og:title", content: "GROOM™ — Track Them. Book Them. Love Them." },
+      { property: "og:title", content: "Boujee Book™ — Track Them. Book Them. Love Them." },
       { property: "og:description", content: "The operating system for personal care." },
       { property: "og:image", content: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&auto=format&fit=crop&q=80" },
     ],

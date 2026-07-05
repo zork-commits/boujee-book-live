@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell } from "@/components/groom/AppShell";
-import { AppTabs } from "@/components/groom/AppTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { AppTabs } from "@/components/boujee/AppTabs";
 import { PROS, CATEGORIES, TRENDING, UPCOMING, RECENT, FAVORITES } from "@/lib/mock";
 import { Search, Bell, Star, MapPin, ChevronRight, Heart, Calendar, CreditCard, BadgeCheck } from "lucide-react";
 
 export const Route = createFileRoute("/app/")({
-  head: () => ({ meta: [{ title: "GROOM — Find Your Next Professional" }] }),
+  head: () => ({ meta: [{ title: "Boujee Book — Find Your Next Professional" }] }),
   component: Home,
 });
 

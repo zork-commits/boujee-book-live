@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { WebNav } from "@/components/groom/WebNav";
-import { WebFooter } from "@/components/groom/WebFooter";
+import { WebNav } from "@/components/boujee/WebNav";
+import { WebFooter } from "@/components/boujee/WebFooter";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({ meta: [{ title: "About — GROOM™" }, { name: "description", content: "GROOM is the operating system for personal care." }] }),
+  head: () => ({ meta: [{ title: "About — Boujee Book™" }, { name: "description", content: "Boujee Book is the operating system for personal care." }] }),
   component: About,
 });
 

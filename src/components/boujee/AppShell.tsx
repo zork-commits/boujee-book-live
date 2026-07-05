@@ -8,7 +8,7 @@ export function AppShell({ children, dark = false }: { children: ReactNode; dark
         <div className="lg:rounded-[3rem] lg:border-[10px] lg:border-ink lg:overflow-hidden lg:shadow-luxury relative bg-background">
           <div className={`hidden lg:flex items-center justify-between px-7 pt-3 pb-1 text-[11px] font-medium ${dark ? "text-white bg-ink" : "text-foreground"}`}>
             <span>9:41</span>
-            <span className="font-display tracking-[0.3em] text-[10px] opacity-60">GROOM</span>
+            <span className="font-display tracking-[0.3em] text-[10px] opacity-60">BOUJEE BOOK</span>
             <span>●●●●●</span>
           </div>
           <div className={`${dark ? "bg-ink text-white" : "bg-background"} min-h-screen lg:min-h-[820px] lg:max-h-[820px] lg:overflow-y-auto no-scrollbar`}>

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell } from "@/components/groom/AppShell";
-import { ProTabs } from "@/components/groom/ProTabs";
-import { Sparkline, Bars } from "@/components/groom/Sparkline";
+import { AppShell } from "@/components/boujee/AppShell";
+import { ProTabs } from "@/components/boujee/ProTabs";
+import { Sparkline, Bars } from "@/components/boujee/Sparkline";
 import { PRO_EARNINGS } from "@/lib/mock";
 import { ArrowUpRight, Download } from "lucide-react";
 

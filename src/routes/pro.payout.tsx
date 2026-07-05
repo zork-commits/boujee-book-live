@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell } from "@/components/groom/AppShell";
-import { ProTabs } from "@/components/groom/ProTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { ProTabs } from "@/components/boujee/ProTabs";
 import { PRO_EARNINGS } from "@/lib/mock";
 import { ChevronLeft, Zap, Building2, Check } from "lucide-react";
 
 export const Route = createFileRoute("/pro/payout")({
-  head: () => ({ meta: [{ title: "Payout — GROOM Pro" }] }),
+  head: () => ({ meta: [{ title: "Payout — Boujee Book Pro" }] }),
   component: Payout,
 });
 

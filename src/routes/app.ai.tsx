@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/groom/AppShell";
-import { AppTabs } from "@/components/groom/AppTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { AppTabs } from "@/components/boujee/AppTabs";
 import { Sparkles, Send } from "lucide-react";
 import { useState } from "react";
 
@@ -27,7 +27,7 @@ function AI() {
       <header className="px-5 pt-6 pb-3 flex items-center gap-3">
         <div className="h-10 w-10 rounded-full bg-gold/20 grid place-items-center"><Sparkles className="h-4 w-4 text-gold" /></div>
         <div>
-          <div className="font-display text-xl text-white">GROOM AI</div>
+          <div className="font-display text-xl text-white">Boujee AI</div>
           <div className="text-[10px] uppercase tracking-widest text-white/40">Always on</div>
         </div>
       </header>

@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { WebNav } from "@/components/groom/WebNav";
-import { WebFooter } from "@/components/groom/WebFooter";
+import { WebNav } from "@/components/boujee/WebNav";
+import { WebFooter } from "@/components/boujee/WebFooter";
 import { Check, Crown } from "lucide-react";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({ meta: [
-    { title: "Pricing — GROOM™" },
+    { title: "Pricing — Boujee Book™" },
     { name: "description", content: "Subscription-only. No commissions, ever. Two plans for customers, two for pros." },
   ] }),
   component: Pricing,
@@ -28,7 +28,7 @@ function Pricing() {
       <section className="bg-ink text-white pt-40 pb-20 text-center px-6">
         <div className="text-[11px] tracking-[0.4em] text-gold uppercase mb-6">Pricing</div>
         <h1 className="font-display text-5xl lg:text-7xl">Subscription only.</h1>
-        <p className="mt-4 text-white/60 max-w-xl mx-auto">No commission. No service fees. Pros keep 100% of what they earn — GROOM™ runs on memberships.</p>
+        <p className="mt-4 text-white/60 max-w-xl mx-auto">No commission. No service fees. Pros keep 100% of what they earn — Boujee Book™ runs on memberships.</p>
       </section>
 
       <section className="py-20 px-6">

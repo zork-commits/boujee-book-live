@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { AppShell } from "@/components/groom/AppShell";
-import { AppTabs } from "@/components/groom/AppTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { AppTabs } from "@/components/boujee/AppTabs";
 import { ChevronLeft, ShieldCheck } from "lucide-react";
 import { PAST } from "@/lib/mock";
 
 export const Route = createFileRoute("/app/dispute")({
-  head: () => ({ meta: [{ title: "Dispute Center — GROOM" }] }),
+  head: () => ({ meta: [{ title: "Dispute Center — Boujee Book" }] }),
   component: Dispute,
 });
 

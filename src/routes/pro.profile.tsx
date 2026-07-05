@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/groom/AppShell";
-import { ProTabs } from "@/components/groom/ProTabs";
+import { AppShell } from "@/components/boujee/AppShell";
+import { ProTabs } from "@/components/boujee/ProTabs";
 import { PRO_ME } from "@/lib/mock";
 import { Plus, Camera, Star, ChevronRight } from "lucide-react";
 

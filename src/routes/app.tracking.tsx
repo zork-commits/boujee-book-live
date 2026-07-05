@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell } from "@/components/groom/AppShell";
+import { AppShell } from "@/components/boujee/AppShell";
 import { UPCOMING } from "@/lib/mock";
 import { ChevronLeft, Phone, MessageSquare, Shield } from "lucide-react";
 
@@ -57,7 +57,7 @@ function Tracking() {
             <button className="h-10 w-10 rounded-full bg-ink text-white grid place-items-center"><Phone className="h-4 w-4" /></button>
           </div>
 
-          <div className="mt-4 text-[11px] text-muted-foreground inline-flex items-center gap-1"><Shield className="h-3 w-3" />GROOM Safety: pin shared at arrival</div>
+          <div className="mt-4 text-[11px] text-muted-foreground inline-flex items-center gap-1"><Shield className="h-3 w-3" />Boujee Book Safety: pin shared at arrival</div>
         </div>
       </div>
     </AppShell>

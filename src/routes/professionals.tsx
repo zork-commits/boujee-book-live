@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { WebNav } from "@/components/groom/WebNav";
-import { WebFooter } from "@/components/groom/WebFooter";
+import { WebNav } from "@/components/boujee/WebNav";
+import { WebFooter } from "@/components/boujee/WebFooter";
 import { ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/professionals")({
-  head: () => ({ meta: [{ title: "For Professionals — GROOM™" }, { name: "description", content: "Grow your book. Get paid faster." }] }),
+  head: () => ({ meta: [{ title: "For Professionals — Boujee Book™" }, { name: "description", content: "Grow your book. Get paid faster." }] }),
   component: Pros,
 });
 
