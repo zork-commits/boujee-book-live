@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/boujee/AppShell";
 import { AppTabs } from "@/components/boujee/AppTabs";
-import { PROS, CATEGORIES, TRENDING, UPCOMING, RECENT, FAVORITES } from "@/lib/mock";
+import { CATEGORIES, TRENDING } from "@/lib/mock";
+import { usePros, useMyBookings, useFavorites, fmtWhen, initials } from "@/lib/api";
 import { Search, Bell, Star, MapPin, ChevronRight, Heart, Calendar, CreditCard, BadgeCheck } from "lucide-react";
 
 export const Route = createFileRoute("/app/")({
@@ -9,17 +10,22 @@ export const Route = createFileRoute("/app/")({
   component: Home,
 });
 
-const ICONS: Record<string, any> = { Booked: Calendar, Reviewed: Star, Favorited: Heart, Paid: CreditCard };
-
 function Home() {
+  const { user } = Route.useRouteContext();
+  const { data: pros } = usePros();
+  const { data: bookings } = useMyBookings();
+  const { data: favorites } = useFavorites();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+
   return (
     <AppShell>
       <header className="px-5 pt-6 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-gold/40 to-gold/10 grid place-items-center font-display text-base">MR</div>
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-gold/40 to-gold/10 grid place-items-center font-display text-base">{initials(user.name)}</div>
           <div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Good evening</div>
-            <div className="font-display text-lg leading-tight">Maya</div>
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{greeting}</div>
+            <div className="font-display text-lg leading-tight">{user.name.split(" ")[0]}</div>
           </div>
         </div>
         <button className="h-10 w-10 grid place-items-center rounded-full border border-border relative">
@@ -47,7 +53,7 @@ function Home() {
         <SectionHead title="Categories" />
         <div className="mt-3 grid grid-cols-4 gap-3">
           {CATEGORIES.slice(0,8).map(c=>(
-            <Link key={c.key} to="/app/search" className="flex flex-col items-center gap-1.5 py-3 rounded-2xl bg-cream border border-border">
+            <Link key={c.key} to="/app/search" search={{ cat: c.key }} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl bg-cream border border-border">
               <span className="text-xl">{c.emoji}</span>
               <span className="text-[10px]">{c.label}</span>
             </Link>
@@ -55,40 +61,41 @@ function Home() {
         </div>
       </section>
 
-      <section className="mt-7">
-        <div className="px-5"><SectionHead title="Upcoming" link="/app/bookings" /></div>
-        <div className="mt-3 flex gap-3 px-5 overflow-x-auto no-scrollbar pb-1">
-          {UPCOMING.map(a=>(
-            <Link key={a.id} to="/app/tracking" className="shrink-0 w-[280px] rounded-2xl bg-ink text-white p-4">
-              <div className="flex items-center gap-3">
-                <img src={a.pro.avatar} alt={a.pro.name} className="h-11 w-11 rounded-full object-cover" />
-                <div className="flex-1 min-w-0">
-                  <div className="font-display text-base truncate">{a.pro.name}</div>
-                  <div className="text-[11px] text-white/60 truncate">{a.service}</div>
+      {(bookings?.upcoming.length ?? 0) > 0 && (
+        <section className="mt-7">
+          <div className="px-5"><SectionHead title="Upcoming" link="/app/bookings" /></div>
+          <div className="mt-3 flex gap-3 px-5 overflow-x-auto no-scrollbar pb-1">
+            {bookings!.upcoming.map(a=>(
+              <Link key={a.booking.id} to="/app/tracking" className="shrink-0 w-[280px] rounded-2xl bg-ink text-white p-4">
+                <div className="flex items-center gap-3">
+                  <img src={a.proAvatar} alt={a.proName} className="h-11 w-11 rounded-full object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display text-base truncate">{a.proName}</div>
+                    <div className="text-[11px] text-white/60 truncate">{a.booking.serviceName}</div>
+                  </div>
+                  <BadgeCheck className="h-4 w-4 text-gold" />
                 </div>
-                <BadgeCheck className="h-4 w-4 text-gold" />
-              </div>
-              <div className="mt-4 flex items-end justify-between">
-                <div>
-                  <div className="text-[10px] uppercase tracking-widest text-white/50">{a.status}</div>
-                  <div className="font-display text-lg">{a.when}</div>
+                <div className="mt-4 flex items-end justify-between">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-widest text-white/50">{a.booking.status}</div>
+                    <div className="font-display text-lg">{fmtWhen(a.booking.scheduledAt)}</div>
+                  </div>
+                  <span className="text-[10px] text-gold">Track →</span>
                 </div>
-                <span className="text-[10px] text-gold">Track →</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="mt-7">
         <div className="px-5"><SectionHead title="Featured Professionals" link="/app/search" /></div>
         <div className="mt-3 flex gap-3 px-5 overflow-x-auto no-scrollbar pb-1">
-          {PROS.map(p=>(
+          {(pros ?? []).map(p=>(
             <Link key={p.id} to="/app/p/$id" params={{id:p.id}} className="shrink-0 w-[230px] rounded-2xl overflow-hidden bg-background border border-border">
               <div className="relative aspect-[4/5]">
                 <img src={p.cover} alt={p.name} className="h-full w-full object-cover" />
                 {p.elite && <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-gold text-ink text-[9px] tracking-widest uppercase font-semibold">Elite</span>}
-                <button className="absolute top-2 right-2 h-7 w-7 rounded-full bg-background/90 grid place-items-center"><Heart className="h-3.5 w-3.5" /></button>
               </div>
               <div className="p-3">
                 <div className="flex items-center justify-between">
@@ -123,37 +130,42 @@ function Home() {
         </div>
       </section>
 
-      <section className="mt-7 px-5">
-        <SectionHead title="Favorites" link="/app/me" />
-        <div className="mt-3 flex gap-3 overflow-x-auto no-scrollbar pb-1">
-          {FAVORITES.map(p=>(
-            <Link key={p.id} to="/app/p/$id" params={{id:p.id}} className="shrink-0 flex flex-col items-center w-16">
-              <img src={p.avatar} alt={p.name} className="h-14 w-14 rounded-full object-cover ring-2 ring-gold/50" />
-              <div className="text-[10px] mt-1.5 truncate w-full text-center">{p.name.split(" ")[0]}</div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {(favorites?.length ?? 0) > 0 && (
+        <section className="mt-7 px-5">
+          <SectionHead title="Favorites" link="/app/me" />
+          <div className="mt-3 flex gap-3 overflow-x-auto no-scrollbar pb-1">
+            {favorites!.map(p=>(
+              <Link key={p.id} to="/app/p/$id" params={{id:p.id}} className="shrink-0 flex flex-col items-center w-16">
+                <img src={p.avatar} alt={p.name} className="h-14 w-14 rounded-full object-cover ring-2 ring-gold/50" />
+                <div className="text-[10px] mt-1.5 truncate w-full text-center">{p.name.split(" ")[0]}</div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
-      <section className="mt-7 px-5">
-        <SectionHead title="Recent Activity" />
-        <div className="mt-3 rounded-2xl border border-border divide-y divide-border">
-          {RECENT.map(r=>{
-            const Icon = ICONS[r.type] || Calendar;
-            return (
-              <div key={r.id} className="flex items-center gap-3 p-3">
-                <div className="h-8 w-8 rounded-full bg-cream grid place-items-center"><Icon className="h-3.5 w-3.5" /></div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs"><span className="font-medium">{r.type}</span> · {r.pro.name}</div>
-                  <div className="text-[10px] text-muted-foreground truncate">{r.note}</div>
+      {(bookings?.past.length ?? 0) > 0 && (
+        <section className="mt-7 px-5">
+          <SectionHead title="Recent Activity" />
+          <div className="mt-3 rounded-2xl border border-border divide-y divide-border">
+            {bookings!.past.slice(0,4).map(r=>{
+              const Icon = r.booking.status === "completed" ? CreditCard : Calendar;
+              return (
+                <div key={r.booking.id} className="flex items-center gap-3 p-3">
+                  <div className="h-8 w-8 rounded-full bg-cream grid place-items-center"><Icon className="h-3.5 w-3.5" /></div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs"><span className="font-medium capitalize">{r.booking.status}</span> · {r.proName}</div>
+                    <div className="text-[10px] text-muted-foreground truncate">${r.booking.price} · {r.booking.serviceName}</div>
+                  </div>
+                  <div className="text-[10px] text-muted-foreground">{fmtWhen(r.booking.scheduledAt)}</div>
                 </div>
-                <div className="text-[10px] text-muted-foreground">{r.at}</div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
+      <div className="h-4" />
       <AppTabs />
     </AppShell>
   );

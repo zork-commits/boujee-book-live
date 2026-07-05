@@ -61,7 +61,11 @@ export const createBooking = createServerFn({ method: "POST" })
 export const myBookings = createServerFn({ method: "GET" }).handler(async () => {
   const user = await requireUser();
   const rows = await db
-    .select({ booking: bookings, ...proSummary })
+    .select({
+      booking: bookings,
+      ...proSummary,
+      myRating: sql<number | null>`(select rating from reviews where reviews.booking_id = ${bookings.id})`,
+    })
     .from(bookings)
     .innerJoin(pros, eq(bookings.proId, pros.id))
     .where(eq(bookings.customerId, user.id))

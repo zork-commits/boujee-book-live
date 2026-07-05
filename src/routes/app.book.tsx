@@ -1,33 +1,64 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
-import { PROS } from "@/lib/mock";
-import { ChevronLeft, MapPin, Check, CreditCard } from "lucide-react";
+import { getPro } from "@/server/pros";
+import { useCreateBooking } from "@/lib/api";
+import { ChevronLeft, MapPin, Check, CreditCard, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/app/book")({
-  validateSearch: (s: Record<string, unknown>) => ({ pro: (s.pro as string) || PROS[0].id, service: (s.service as string) || "" }),
+  validateSearch: (s: Record<string, unknown>): { pro: string; service?: string } => ({
+    pro: (s.pro as string) || "",
+    service: typeof s.service === "string" && s.service ? s.service : undefined,
+  }),
+  loaderDeps: ({ search }) => ({ pro: search.pro }),
+  loader: async ({ deps }) => {
+    const pro = await getPro({ data: { id: deps.pro } });
+    if (!pro) throw new Error("Pro not found");
+    return { pro };
+  },
   component: Booking,
 });
 
 const STEPS = ["Service","Date","Time","Location","Pay"];
 
 function Booking() {
-  const { pro: proId, service: initialService } = Route.useSearch();
-  const pro = PROS.find(p=>p.id===proId) || PROS[0];
-  const [step, setStep] = useState(initialService ? 1 : 0);
-  const [service, setService] = useState(initialService || pro.services[0].name);
+  const { pro } = Route.useLoaderData();
+  const { service: initialServiceId } = Route.useSearch();
+  const [step, setStep] = useState(initialServiceId ? 1 : 0);
+  const [serviceId, setServiceId] = useState(initialServiceId || pro.services[0]?.id || "");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [where, setWhere] = useState<"shop"|"mobile">("shop");
   const [pay, setPay] = useState("apple");
+  const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
-  const svc = pro.services.find(s=>s.name===service) || pro.services[0];
+  const createBooking = useCreateBooking();
+  const svc = pro.services.find(s=>s.id===serviceId) || pro.services[0];
 
   const dates = Array.from({length:7}).map((_,i)=>{
     const d = new Date(); d.setDate(d.getDate()+i);
     return { iso: d.toISOString().slice(0,10), day: d.toLocaleDateString("en",{weekday:"short"}), num: d.getDate() };
   });
   const times = ["09:00","10:30","12:00","13:30","15:00","16:30","18:00","19:30"];
+
+  const canContinue = [!!serviceId, !!date, !!time, true, true][step];
+
+  const confirm = async () => {
+    setError(null);
+    const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
+    try {
+      const res = await createBooking.mutateAsync({
+        proId: pro.id,
+        serviceId: svc.id,
+        scheduledAt,
+        location: where,
+      });
+      if (!res.ok) { setError(res.error); return; }
+      nav({ to: "/app/bookings" });
+    } catch {
+      setError("Something went wrong — try again.");
+    }
+  };
 
   return (
     <AppShell>
@@ -50,10 +81,10 @@ function Booking() {
         {step===0 && (
           <div className="space-y-2">
             {pro.services.map(s=>(
-              <button key={s.name} onClick={()=>setService(s.name)} className={`w-full flex items-center justify-between p-4 rounded-2xl border ${service===s.name?"border-ink bg-ink text-white":"border-border"}`}>
+              <button key={s.id} onClick={()=>setServiceId(s.id)} className={`w-full flex items-center justify-between p-4 rounded-2xl border ${serviceId===s.id?"border-ink bg-ink text-white":"border-border"}`}>
                 <div className="text-left">
                   <div className="text-sm font-medium">{s.name}</div>
-                  <div className={`text-[11px] ${service===s.name?"text-white/60":"text-muted-foreground"}`}>{s.mins} min</div>
+                  <div className={`text-[11px] ${serviceId===s.id?"text-white/60":"text-muted-foreground"}`}>{s.mins} min</div>
                 </div>
                 <div className="text-sm">${s.price}</div>
               </button>
@@ -102,20 +133,29 @@ function Booking() {
               ))}
             </div>
             <div className="mt-5 rounded-2xl border border-border p-4 space-y-2 text-sm">
-              <Row k={service} v={`$${svc.price}`} />
+              <Row k={svc.name} v={`$${svc.price}`} />
               {where==="mobile" && <Row k="Mobile fee" v="$25" />}
               <Row k="Service fee" v="$4" />
               <div className="border-t border-border pt-2 mt-2 flex justify-between font-medium"><span>Total</span><span>${svc.price + (where==="mobile"?25:0) + 4}</span></div>
             </div>
+            <div className="mt-3 text-[10px] text-muted-foreground text-center">
+              {date && time ? `${new Date(`${date}T${time}:00`).toLocaleString("en-US",{weekday:"long",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}` : ""}
+            </div>
+            {error && <div className="mt-2 text-xs text-destructive text-center">{error}</div>}
           </div>
         )}
       </div>
 
       <div className="sticky bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl px-5 py-3">
         {step < 4 ? (
-          <button onClick={()=>setStep(step+1)} className="w-full h-12 rounded-full bg-ink text-white font-medium text-sm">Continue</button>
+          <button disabled={!canContinue} onClick={()=>setStep(step+1)} className="w-full h-12 rounded-full bg-ink text-white font-medium text-sm disabled:opacity-40">Continue</button>
         ) : (
-          <Link to="/app/bookings" className="block w-full h-12 rounded-full bg-gold text-ink font-medium text-sm grid place-items-center"><span className="inline-flex items-center gap-2"><Check className="h-4 w-4" />Confirm & Pay</span></Link>
+          <button onClick={confirm} disabled={createBooking.isPending} className="w-full h-12 rounded-full bg-gold text-ink font-medium text-sm grid place-items-center disabled:opacity-60">
+            <span className="inline-flex items-center gap-2">
+              {createBooking.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              Confirm & Pay
+            </span>
+          </button>
         )}
       </div>
     </AppShell>

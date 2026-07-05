@@ -2,17 +2,23 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
 import { AppTabs } from "@/components/boujee/AppTabs";
-import { PROS, CATEGORIES } from "@/lib/mock";
-import { Search, SlidersHorizontal, Star, MapPin, ChevronLeft } from "lucide-react";
+import { CATEGORIES } from "@/lib/mock";
+import { usePros } from "@/lib/api";
+import { Search, SlidersHorizontal, Star, MapPin, ChevronLeft, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/app/search")({
+  validateSearch: (s: Record<string, unknown>): { cat?: string } => ({
+    cat: typeof s.cat === "string" ? s.cat : undefined,
+  }),
   component: Discover,
 });
 
 function Discover() {
+  const { cat: initialCat } = Route.useSearch();
   const [q, setQ] = useState("");
-  const [cat, setCat] = useState<string | null>(null);
-  const filtered = PROS.filter(p => (!q || p.name.toLowerCase().includes(q.toLowerCase()) || p.craft.toLowerCase().includes(q.toLowerCase())) && (!cat || p.craft.toLowerCase().includes(cat)));
+  const [cat, setCat] = useState<string | null>(initialCat ?? null);
+  const { data: pros, isLoading } = usePros({ q: q || undefined, category: cat ?? undefined });
+
   return (
     <AppShell>
       <header className="px-5 pt-6 pb-3 flex items-center gap-3">
@@ -33,16 +39,18 @@ function Discover() {
         ))}
       </div>
 
-      <div className="px-5 mt-6 text-xs text-muted-foreground">{filtered.length} pros nearby</div>
+      <div className="px-5 mt-6 text-xs text-muted-foreground">
+        {isLoading ? <span className="inline-flex items-center gap-2"><Loader2 className="h-3 w-3 animate-spin" />Searching…</span> : `${pros?.length ?? 0} pros nearby`}
+      </div>
 
       <div className="px-5 mt-3 space-y-3 pb-4">
-        {filtered.map(p=>(
+        {(pros ?? []).map(p=>(
           <Link key={p.id} to="/app/p/$id" params={{id:p.id}} className="flex gap-3 p-3 rounded-2xl border border-border bg-background">
             <img src={p.cover} alt={p.name} className="h-24 w-24 rounded-xl object-cover" />
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
                 <div className="font-display text-base truncate">{p.name}</div>
-                <div className="flex items-center gap-0.5 text-[11px]"><Star className="h-3 w-3 fill-gold text-gold" />{p.rating}<span className="text-muted-foreground"> ({p.reviews})</span></div>
+                <div className="flex items-center gap-0.5 text-[11px]"><Star className="h-3 w-3 fill-gold text-gold" />{p.rating}<span className="text-muted-foreground"> ({p.reviewCount})</span></div>
               </div>
               <div className="text-[11px] text-muted-foreground">{p.craft}</div>
               <div className="mt-2 flex flex-wrap gap-1">
@@ -55,6 +63,9 @@ function Discover() {
             </div>
           </Link>
         ))}
+        {!isLoading && (pros?.length ?? 0) === 0 && (
+          <div className="text-center py-12 text-sm text-muted-foreground">No pros match that search yet.</div>
+        )}
       </div>
       <AppTabs />
     </AppShell>
