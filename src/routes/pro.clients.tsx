@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
 import { ProTabs } from "@/components/boujee/ProTabs";
 import { useProDashboard, fmtWhen, initials } from "@/lib/api";
 import { Search, MessageSquare, Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/pro/clients")({ component: Clients });
 
@@ -16,7 +17,13 @@ function Clients() {
     <AppShell dark>
       <header className="px-5 pt-6 pb-3 text-white flex items-center justify-between">
         <h1 className="font-display text-3xl">Clients</h1>
-        <button className="h-10 w-10 grid place-items-center rounded-full bg-gold text-ink"><Plus className="h-4 w-4" /></button>
+        <button
+          onClick={() => toast("Clients add themselves", { description: "Anyone who books you appears here automatically with their history." })}
+          aria-label="About adding clients"
+          className="h-10 w-10 grid place-items-center rounded-full bg-gold text-ink"
+        >
+          <Plus className="h-4 w-4" />
+        </button>
       </header>
       <div className="px-5 mt-2">
         <div className="flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-4 py-2.5">
@@ -33,7 +40,7 @@ function Clients() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <div className="font-display text-base">{c.name}</div>
-                  <button className="h-7 w-7 rounded-full bg-white/10 grid place-items-center"><MessageSquare className="h-3.5 w-3.5" /></button>
+                  <Link to="/app/messages" aria-label={`Message ${c.name}`} className="h-7 w-7 rounded-full bg-white/10 grid place-items-center"><MessageSquare className="h-3.5 w-3.5" /></Link>
                 </div>
                 <div className="text-[11px] text-white/50">{c.visits} visits · last {fmtWhen(c.last)}</div>
                 <div className="mt-2 flex gap-2 text-[10px]">

@@ -4,6 +4,10 @@ import { AppShell } from "@/components/boujee/AppShell";
 import { useBecomePro } from "@/lib/api";
 import { CRAFTS } from "@/fn/pro-profile";
 import { Check, Upload, ShieldCheck, IdCard, Sparkles, Scissors, Trash2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+const uploadToast = () =>
+  toast("Uploads open at launch", { description: "You can finish your application without photos \u2014 our trust team will follow up." });
 
 export const Route = createFileRoute("/pro/onboarding")({
   head: () => ({ meta: [{ title: "Become a Pro — Boujee Book" }] }),
@@ -119,7 +123,7 @@ function Onboarding() {
               <div className="text-[10px] uppercase tracking-widest text-white/50">State license</div>
               <Field label="License number" placeholder="CA-BARB-44912" value={licenseNumber} onChange={setLicenseNumber} />
               <Field label="State / region" placeholder="California" value={licenseRegion} onChange={setLicenseRegion} />
-              <button type="button" className="mt-3 w-full py-6 rounded-2xl border border-dashed border-white/20 text-sm text-white/70 flex items-center justify-center gap-2"><Upload className="h-4 w-4" />Upload license photo</button>
+              <button type="button" onClick={uploadToast} className="mt-3 w-full py-6 rounded-2xl border border-dashed border-white/20 text-sm text-white/70 flex items-center justify-center gap-2"><Upload className="h-4 w-4" />Upload license photo</button>
               <div className="mt-3 text-[10px] text-white/50">Verified within 24 hours by our trust team. You can start taking bookings right away — the verified badge appears after review.</div>
             </div>
           </>)}
@@ -128,8 +132,8 @@ function Onboarding() {
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-gold" /><span className="text-sm">Identity verification</span></div>
               <p className="text-xs text-white/60 mt-2">Powered by Persona. Takes 60 seconds.</p>
-              <button type="button" className="mt-4 w-full py-6 rounded-2xl border border-dashed border-white/20 text-sm text-white/70 flex items-center justify-center gap-2"><Upload className="h-4 w-4" />Scan government ID</button>
-              <button type="button" className="mt-2 w-full py-6 rounded-2xl border border-dashed border-white/20 text-sm text-white/70 flex items-center justify-center gap-2"><Upload className="h-4 w-4" />Take selfie</button>
+              <button type="button" onClick={uploadToast} className="mt-4 w-full py-6 rounded-2xl border border-dashed border-white/20 text-sm text-white/70 flex items-center justify-center gap-2"><Upload className="h-4 w-4" />Scan government ID</button>
+              <button type="button" onClick={uploadToast} className="mt-2 w-full py-6 rounded-2xl border border-dashed border-white/20 text-sm text-white/70 flex items-center justify-center gap-2"><Upload className="h-4 w-4" />Take selfie</button>
               <label className="mt-4 flex items-start gap-2 text-xs text-white/70">
                 <input type="checkbox" className="mt-0.5" /> I consent to a background check (required for mobile services).
               </label>

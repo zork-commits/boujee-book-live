@@ -3,6 +3,10 @@ import { AppShell } from "@/components/boujee/AppShell";
 import { ProTabs } from "@/components/boujee/ProTabs";
 import { useProDashboard } from "@/lib/api";
 import { ChevronLeft, Zap, Building2, Check, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+const bankToast = () =>
+  toast("Bank linking arrives with Stripe Connect", { description: "Your balance keeps accruing — payouts activate at launch." });
 
 export const Route = createFileRoute("/pro/payout")({
   head: () => ({ meta: [{ title: "Payout — Boujee Book Pro" }] }),
@@ -39,8 +43,8 @@ function Payout() {
               {isLoading ? <Loader2 className="h-8 w-8 animate-spin" /> : `$${available.toLocaleString()}`}
             </div>
             <div className="mt-5 grid grid-cols-2 gap-2">
-              <button className="py-3 rounded-full bg-ink text-white text-sm font-medium inline-flex items-center justify-center gap-1"><Zap className="h-3.5 w-3.5 text-gold" />Instant payout</button>
-              <button className="py-3 rounded-full bg-white/30 text-ink text-sm font-medium">Standard (1–2d)</button>
+              <button onClick={bankToast} className="py-3 rounded-full bg-ink text-white text-sm font-medium inline-flex items-center justify-center gap-1"><Zap className="h-3.5 w-3.5 text-gold" />Instant payout</button>
+              <button onClick={bankToast} className="py-3 rounded-full bg-white/30 text-ink text-sm font-medium">Standard (1–2d)</button>
             </div>
             <div className="text-[10px] mt-3 opacity-70">Instant payouts arrive in seconds. 1% fee for Basic, free for Elite pros.</div>
           </div>
@@ -56,7 +60,7 @@ function Payout() {
             </div>
             <Check className="h-4 w-4 text-white/30" />
           </div>
-          <button className="mt-2 w-full py-3 rounded-2xl border border-dashed border-white/20 text-sm text-white/70">+ Add bank or debit card</button>
+          <button onClick={bankToast} className="mt-2 w-full py-3 rounded-2xl border border-dashed border-white/20 text-sm text-white/70">+ Add bank or debit card</button>
         </section>
 
         <section className="px-5 mt-6 pb-4">

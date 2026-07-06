@@ -62,13 +62,13 @@ function Landing() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {CATEGORIES.map(c => (
-              <div key={c.key} className="aspect-square rounded-3xl bg-cream border border-border p-6 flex flex-col justify-between hover:shadow-luxury transition-all">
+              <Link key={c.key} to="/app/search" search={{ cat: c.key }} className="aspect-square rounded-3xl bg-cream border border-border p-6 flex flex-col justify-between hover:shadow-luxury transition-all">
                 <CategoryIcon category={c.key} className="h-9 w-9 text-gold" strokeWidth={1.5} />
                 <div>
                   <div className="font-display text-2xl">{c.label}</div>
                   <div className="text-xs text-muted-foreground mt-1">from $45</div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

@@ -4,7 +4,8 @@ import { AppTabs } from "@/components/boujee/AppTabs";
 import { CATEGORIES, TRENDING } from "@/lib/mock";
 import { CategoryIcon } from "@/components/boujee/CategoryIcon";
 import { usePros, useMyBookings, useFavorites, fmtWhen, initials } from "@/lib/api";
-import { Search, Bell, Star, MapPin, ChevronRight, Heart, Calendar, CreditCard, BadgeCheck } from "lucide-react";
+import { Search, Bell, Star, MapPin, ChevronRight, Calendar, CreditCard, BadgeCheck, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/")({
   head: () => ({ meta: [{ title: "Boujee Book — Find Your Next Professional" }] }),
@@ -29,10 +30,19 @@ function Home() {
             <div className="font-display text-lg leading-tight">{user.name.split(" ")[0]}</div>
           </div>
         </div>
-        <button className="h-10 w-10 grid place-items-center rounded-full border border-border relative">
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-gold" />
-        </button>
+        <div className="flex items-center gap-2">
+          <Link to="/app/ai" aria-label="Boujee AI concierge" className="h-10 w-10 grid place-items-center rounded-full bg-ink text-gold">
+            <Sparkles className="h-4 w-4" />
+          </Link>
+          <button
+            onClick={() => toast("You're all caught up", { description: "Booking updates and pro replies will show up here." })}
+            aria-label="Notifications"
+            className="h-10 w-10 grid place-items-center rounded-full border border-border relative"
+          >
+            <Bell className="h-4 w-4" />
+            <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-gold" />
+          </button>
+        </div>
       </header>
 
       <div className="px-5 mt-4">
@@ -45,8 +55,14 @@ function Home() {
       </div>
 
       <div className="mt-5 flex gap-2 px-5 overflow-x-auto no-scrollbar">
-        {["Near me","Open now","Elite","Mobile","Top rated","Under $80"].map((q,i)=>(
-          <button key={q} className={`shrink-0 px-3.5 py-2 rounded-full text-xs border ${i===0?"bg-ink text-white border-ink":"border-border"}`}>{q}</button>
+        {([
+          { label: "Near me", search: { sort: "distance" as const } },
+          { label: "Top rated", search: { sort: "rating" as const } },
+          { label: "Elite", search: { f: "elite" as const } },
+          { label: "Mobile", search: { f: "mobile" as const } },
+          { label: "Under $80", search: { f: "under80" as const } },
+        ]).map((chip, i)=>(
+          <Link key={chip.label} to="/app/search" search={chip.search} className={`shrink-0 px-3.5 py-2 rounded-full text-xs border ${i===0?"bg-ink text-white border-ink":"border-border"}`}>{chip.label}</Link>
         ))}
       </div>
 

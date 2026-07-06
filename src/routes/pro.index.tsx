@@ -4,6 +4,7 @@ import { ProTabs } from "@/components/boujee/ProTabs";
 import { Bars } from "@/components/boujee/Sparkline";
 import { useProDashboard, useSetBookingStatus } from "@/lib/api";
 import { Bell, ArrowUpRight, Loader2, Check } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/pro/")({ component: ProHome });
 
@@ -37,7 +38,13 @@ function ProHome() {
             <div className="font-display text-lg leading-tight">{profile?.name}</div>
           </div>
         </div>
-        <button className="h-10 w-10 grid place-items-center rounded-full border border-white/20"><Bell className="h-4 w-4" /></button>
+        <button
+          onClick={() => toast("You're all caught up", { description: "New booking requests and client messages will show up here." })}
+          aria-label="Notifications"
+          className="h-10 w-10 grid place-items-center rounded-full border border-white/20"
+        >
+          <Bell className="h-4 w-4" />
+        </button>
       </header>
 
       <div className="px-5 mt-3">

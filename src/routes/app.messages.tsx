@@ -4,6 +4,7 @@ import { AppShell } from "@/components/boujee/AppShell";
 import { AppTabs } from "@/components/boujee/AppTabs";
 import { useConversations, useThread, useSendMessage, usePro, fmtWhen } from "@/lib/api";
 import { Send, ChevronLeft, Phone, ShieldCheck, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/messages")({
   head: () => ({ meta: [{ title: "Messages — Boujee Book" }] }),
@@ -107,7 +108,13 @@ function Thread({ conversationId, proId, meId, onBack, onCreated }: {
           <div className="font-medium text-sm truncate">{pro?.name ?? "…"}</div>
           <div className="text-[10px] text-muted-foreground flex items-center gap-1"><ShieldCheck className="h-3 w-3 text-gold" />Verified{pro ? ` · ${pro.craft}` : ""}</div>
         </div>
-        <button className="h-9 w-9 rounded-full border border-border grid place-items-center"><Phone className="h-4 w-4" /></button>
+        <button
+          onClick={() => toast("Calls unlock after a confirmed booking", { description: "Numbers stay private — message your pro here in the meantime." })}
+          aria-label="Call"
+          className="h-9 w-9 rounded-full border border-border grid place-items-center"
+        >
+          <Phone className="h-4 w-4" />
+        </button>
       </header>
       <div ref={scrollRef} className="flex-1 px-4 py-4 space-y-3 min-h-[400px]">
         {(messages ?? []).map((m) => {

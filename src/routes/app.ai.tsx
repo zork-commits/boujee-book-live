@@ -8,14 +8,13 @@ export const Route = createFileRoute("/app/ai")({
   component: AI,
 });
 
-const SEED = [
-  { who:"ai", t:"Hi Maya. I'm your AI beauty concierge. Tell me what you're going for." },
-];
-
 const PRESETS = ["Bridal soft glam","Bold red curls","Clean skin fade","Almond Gel-X","Lash refresh"];
 
 function AI() {
-  const [msgs, setMsgs] = useState(SEED);
+  const { user } = Route.useRouteContext();
+  const [msgs, setMsgs] = useState([
+    { who:"ai", t:`Hi ${user.name.split(" ")[0]}. I'm your AI beauty concierge. Tell me what you're going for.` },
+  ]);
   const [v, setV] = useState("");
   function send(text: string) {
     if (!text.trim()) return;

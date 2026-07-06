@@ -2,13 +2,40 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/boujee/AppShell";
 import { ProTabs } from "@/components/boujee/ProTabs";
 import { Sparkline } from "@/components/boujee/Sparkline";
-import { useProDashboard } from "@/lib/api";
+import { useProDashboard, useProBookings } from "@/lib/api";
 import { ArrowUpRight, Download, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/pro/earnings")({ component: Earnings });
 
 function Earnings() {
   const { data, isLoading } = useProDashboard();
+  const { data: allBookings } = useProBookings();
+
+  const exportCsv = () => {
+    const completed = (allBookings ?? []).filter((b) => b.booking.status === "completed");
+    if (completed.length === 0) {
+      toast("Nothing to export yet", { description: "Completed bookings will appear in your statement." });
+      return;
+    }
+    const rows = [
+      ["date", "client", "service", "minutes", "amount_usd", "status"],
+      ...completed.map((b) => [
+        b.booking.scheduledAt.slice(0, 10),
+        b.clientName,
+        b.booking.serviceName,
+        String(b.booking.mins),
+        String(b.booking.price),
+        b.booking.status,
+      ]),
+    ];
+    const csv = rows.map((r) => r.map((c) => `"${c.replaceAll('"', '""')}"`).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    const a = Object.assign(document.createElement("a"), { href: url, download: "boujee-book-earnings.csv" });
+    a.click();
+    URL.revokeObjectURL(url);
+    toast("Statement downloaded", { description: `${completed.length} completed bookings exported as CSV.` });
+  };
 
   if (isLoading || !data) {
     return (
@@ -72,7 +99,7 @@ function Earnings() {
       </section>
 
       <section className="mt-6 px-5 pb-2">
-        <button className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-2xl border border-white/10 text-white text-sm"><Download className="h-4 w-4" />Export 1099 / Tax statement</button>
+        <button onClick={exportCsv} className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-2xl border border-white/10 text-white text-sm"><Download className="h-4 w-4" />Export earnings statement (CSV)</button>
       </section>
       <ProTabs />
     </AppShell>

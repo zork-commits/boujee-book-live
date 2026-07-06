@@ -34,7 +34,12 @@ function Careers() {
                 <div className="font-display text-xl">{r.t}</div>
                 <div className="text-xs text-muted-foreground mt-1">{r.d} · {r.l}</div>
               </div>
-              <button className="text-sm px-4 py-2 rounded-full border border-ink/20">Apply</button>
+              <a
+                href={`mailto:careers@boujeebook.app?subject=${encodeURIComponent(`Application: ${r.t}`)}`}
+                className="text-sm px-4 py-2 rounded-full border border-ink/20"
+              >
+                Apply
+              </a>
             </div>
           ))}
         </div>

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/boujee/AppShell";
 import { useMyBookings, fmtWhen } from "@/lib/api";
 import { ChevronLeft, Phone, MessageSquare, Shield, Scissors, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/tracking")({
   component: Tracking,
@@ -78,7 +79,13 @@ function Tracking() {
               <div className="text-[11px] text-muted-foreground">{next.proCraft} · {next.proCity}</div>
             </div>
             <Link to="/app/messages" search={{ to: next.proId }} className="h-10 w-10 rounded-full bg-cream grid place-items-center"><MessageSquare className="h-4 w-4" /></Link>
-            <button className="h-10 w-10 rounded-full bg-ink text-white grid place-items-center"><Phone className="h-4 w-4" /></button>
+            <button
+              onClick={() => toast("Calls unlock closer to your appointment", { description: "Numbers stay private — message your pro instead." })}
+              aria-label="Call pro"
+              className="h-10 w-10 rounded-full bg-ink text-white grid place-items-center"
+            >
+              <Phone className="h-4 w-4" />
+            </button>
           </div>
 
           <div className="mt-4 text-[11px] text-muted-foreground inline-flex items-center gap-1"><Shield className="h-3 w-3" />Boujee Book Safety: pin shared at arrival</div>

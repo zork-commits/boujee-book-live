@@ -59,8 +59,8 @@ First boot auto-creates `data/boujee.db`, runs DDL, and seeds demo data (dev onl
 1. **Database**: set `DATABASE_URL` to a Turso (or any libsql) instance for production; the file DB is fine for a single node.
 2. **Payments**: the pay step is UI-only. Wire Stripe PaymentIntents in `createBooking` ([src/fn/bookings.ts](src/fn/bookings.ts)) and Stripe Connect for pro payouts (`/pro/payout` shows the real balance but "cash out" is not wired).
 3. ~~Seed data~~ Done: demo seed only runs when `SEED_DEMO=1` or in non-production. Leave `SEED_DEMO` unset in prod for a clean DB.
-4. ~~Pro onboarding~~ Done: applications create a real pro profile (unverified). Remaining: file uploads for license/ID photos (needs object storage + Persona) and an admin review queue to flip `pros.verified`.
-5. **Admin/investor pages**: still on demo numbers; wire to real aggregates or put behind auth before launch.
+4. ~~Pro onboarding~~ Done: applications create a real pro profile (unverified), and `/admin` → Providers has a live approve/reject queue that flips `pros.verified`. Remaining: file uploads for license/ID photos (needs object storage + Persona).
+5. **Admin console**: now auth-gated (admin role only). Overview KPIs and the provider queue are live; users/bookings/payments/disputes tabs are still demo data (labelled) pending payments + dispute persistence. Investor page is public demo numbers.
 6. **Realtime**: messages poll every 5s; swap to websockets/SSE when needed.
 7. Remove the demo-credentials hint from the auth screen ([src/routes/auth.tsx](src/routes/auth.tsx)) before public launch.
 8. **Media uploads**: pro avatar/cover/portfolio use stock defaults — add object storage (S3/R2) for the Camera/Plus buttons in the Studio tab.

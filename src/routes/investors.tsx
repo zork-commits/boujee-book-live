@@ -14,7 +14,7 @@ function Investors() {
       <header className="border-b border-white/10 px-6 lg:px-12 py-5 flex items-center justify-between">
         <Link to="/" className="font-display text-xl tracking-[0.25em] text-gold">BOUJEE BOOK<sup className="text-[9px] tracking-normal opacity-60">™</sup></Link>
         <div className="hidden md:flex items-center gap-2 text-[10px] uppercase tracking-widest text-white/40"><Lock className="h-3 w-3" />Confidential · For investors only</div>
-        <button className="text-xs px-4 py-2 rounded-full border border-white/20 inline-flex items-center gap-1.5"><Download className="h-3 w-3" />Deck</button>
+        <a href="mailto:ir@boujeebook.app?subject=Deck%20request" className="text-xs px-4 py-2 rounded-full border border-white/20 inline-flex items-center gap-1.5"><Download className="h-3 w-3" />Deck</a>
       </header>
 
       <section className="px-6 lg:px-12 pt-12 pb-8">

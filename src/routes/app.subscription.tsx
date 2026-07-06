@@ -72,7 +72,7 @@ function Subscription() {
             </div>
             <button onClick={() => setStep("plan")} className="text-xs underline">Change</button>
           </div>
-          <button className="w-full py-3.5 rounded-2xl bg-ink text-white font-medium flex items-center justify-center gap-2"><Apple className="h-4 w-4" />Pay with Apple Pay</button>
+          <button onClick={() => setStep("done")} className="w-full py-3.5 rounded-2xl bg-ink text-white font-medium flex items-center justify-center gap-2"><Apple className="h-4 w-4" />Pay with Apple Pay</button>
           <div className="rounded-2xl border border-border p-4 space-y-3">
             <div className="flex items-center gap-2 text-xs text-muted-foreground"><CreditCard className="h-4 w-4" />Card details</div>
             <input placeholder="1234 5678 9012 3456" className="w-full px-3 py-3 rounded-xl bg-cream text-sm outline-none" />

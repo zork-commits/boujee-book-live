@@ -3,6 +3,7 @@ import { AppShell } from "@/components/boujee/AppShell";
 import { AppTabs } from "@/components/boujee/AppTabs";
 import { useFavorites, useMyBookings, useLogout, initials } from "@/lib/api";
 import { CreditCard, Bell, Heart, Gift, Settings, ChevronRight, Star, LogOut, MapPin, Shield, Crown, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/me")({
   component: Me,
@@ -46,7 +47,7 @@ function Me() {
       </div>
 
       {(favorites?.length ?? 0) > 0 && (
-        <section className="mt-6 px-5">
+        <section id="favorites" className="mt-6 px-5">
           <h2 className="font-display text-lg mb-3">Favorites</h2>
           <div className="flex gap-3 overflow-x-auto no-scrollbar">
             {favorites!.map(p=>(
@@ -71,18 +72,22 @@ function Me() {
       <section className="mt-6 px-5">
         <div className="rounded-2xl border border-border divide-y divide-border">
           {[
-            { i:CreditCard, l:"Payment methods", v:"•••• 4242" },
-            { i:MapPin, l:"Saved addresses", v:"2 saved" },
-            { i:Bell, l:"Notifications", v:"On" },
-            { i:Heart, l:"Favorites", v:`${favorites?.length ?? 0}` },
-            { i:Gift, l:"Rewards", v:`${points.toLocaleString()} pts` },
+            { i:CreditCard, l:"Payment methods", v:"", onClick: () => toast("Payments arrive at launch", { description: "Cards and Apple Pay activate once Stripe is connected." }) },
+            { i:MapPin, l:"Saved addresses", v:"", onClick: () => toast("Address book coming soon", { description: "You can enter an address on each mobile booking for now." }) },
+            { i:Bell, l:"Notifications", v:"On", onClick: () => toast("Notifications are on", { description: "Fine-grained preferences are coming soon." }) },
+            { i:Heart, l:"Favorites", v:`${favorites?.length ?? 0}`, onClick: () => {
+              const el = document.getElementById("favorites");
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              else nav({ to: "/app/search" });
+            } },
+            { i:Gift, l:"Rewards", v:`${points.toLocaleString()} pts`, onClick: () => toast(`${points.toLocaleString()} points banked`, { description: "You earn 2 points per $1 spent. Redemptions open at launch." }) },
             { i:ShieldCheck, l:"Trust & safety", v:"", to:"/app/safety" as const },
-            { i:Shield, l:"Privacy & data", v:"" },
-            { i:Settings, l:"Account settings", v:"" },
+            { i:Shield, l:"Privacy & data", v:"", to:"/privacy" as const },
+            { i:Settings, l:"Account settings", v:"", onClick: () => toast("Account settings coming soon", { description: "Contact help@boujeebook.app to change your email or name." }) },
           ].map(r=>{const I=r.i;const inner=(<><I className="h-4 w-4 text-muted-foreground" /><span className="flex-1 text-sm">{r.l}</span>{r.v && <span className="text-[11px] text-muted-foreground">{r.v}</span>}<ChevronRight className="h-4 w-4 text-muted-foreground" /></>);return r.to ? (
             <Link key={r.l} to={r.to} className="w-full flex items-center gap-3 p-4 text-left">{inner}</Link>
           ) : (
-            <button key={r.l} className="w-full flex items-center gap-3 p-4 text-left">{inner}</button>
+            <button key={r.l} onClick={r.onClick} className="w-full flex items-center gap-3 p-4 text-left">{inner}</button>
           )})}
         </div>
       </section>

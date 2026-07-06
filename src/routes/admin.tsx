@@ -1,13 +1,42 @@
-import { createFileRoute, Link, useLocation } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Sparkline } from "@/components/boujee/Sparkline";
-import { ADMIN_KPI, PENDING_PROS, DISPUTES, PROS } from "@/lib/mock";
-import { LayoutDashboard, ShieldCheck, Users, AlertTriangle, BarChart3, Search, Check, X, ChevronDown, Calendar, CreditCard, Settings } from "lucide-react";
+import { ADMIN_KPI, DISPUTES } from "@/lib/mock";
+import { getMe } from "@/fn/auth";
+import { adminOverview, adminListPros, adminSetVerification } from "@/fn/admin";
+import { initials } from "@/lib/api";
+import { LayoutDashboard, ShieldCheck, Users, AlertTriangle, BarChart3, Search, Check, X, Calendar, CreditCard, Settings, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Boujee Book" }, { name: "robots", content: "noindex" }] }),
+  beforeLoad: async ({ location }) => {
+    const user = await getMe();
+    if (!user) throw redirect({ to: "/auth", search: { redirect: location.href } });
+    if (user.role !== "admin") throw redirect({ to: "/app" });
+    return { user };
+  },
   component: Admin,
 });
+
+function useAdminPros() {
+  return useQuery({ queryKey: ["adminPros"], queryFn: () => adminListPros() });
+}
+function useAdminOverview() {
+  return useQuery({ queryKey: ["adminOverview"], queryFn: () => adminOverview() });
+}
+function useSetVerification() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { proId: string; action: "approve" | "reject" }) => adminSetVerification({ data }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["adminPros"] });
+      qc.invalidateQueries({ queryKey: ["adminOverview"] });
+      qc.invalidateQueries({ queryKey: ["pros"] });
+    },
+  });
+}
 
 const NAV = [
   { id:"dash", l:"Overview", i:LayoutDashboard },
@@ -21,6 +50,7 @@ const NAV = [
 ];
 
 function Admin() {
+  const { user } = Route.useRouteContext();
   const [tab, setTab] = useState("dash");
   return (
     <div className="min-h-screen bg-cream flex">
@@ -39,8 +69,8 @@ function Admin() {
       <main className="flex-1 min-w-0">
         <header className="border-b border-border bg-background px-6 py-4 flex items-center gap-4">
           <div className="flex items-center gap-2 rounded-full bg-cream px-4 py-2 flex-1 max-w-md"><Search className="h-4 w-4 text-muted-foreground" /><input placeholder="Search bookings, pros, users…" className="bg-transparent text-sm outline-none flex-1" /></div>
-          <div className="text-xs text-muted-foreground">Sarah · Admin</div>
-          <div className="h-9 w-9 rounded-full bg-ink text-white grid place-items-center text-xs">SA</div>
+          <div className="text-xs text-muted-foreground">{user.name} · Admin</div>
+          <div className="h-9 w-9 rounded-full bg-ink text-white grid place-items-center text-xs">{initials(user.name)}</div>
         </header>
 
         <div className="p-6 lg:p-8">
@@ -69,19 +99,20 @@ function KPI({ label, value, delta }: { label:string; value:string; delta:string
 }
 
 function Overview() {
+  const { data } = useAdminOverview();
   return (
     <div>
       <h1 className="font-display text-3xl">Overview</h1>
-      <div className="text-sm text-muted-foreground">Last 30 days · all cities</div>
+      <div className="text-sm text-muted-foreground">Live platform totals · demo projections marked</div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
-        <KPI label="GMV" value={`$${(ADMIN_KPI.gmv/1e6).toFixed(2)}M`} delta="+22.8%" />
-        <KPI label="Net revenue" value={`$${(ADMIN_KPI.take/1e3).toFixed(0)}K`} delta="+24.1%" />
-        <KPI label="MRR" value={`$${(ADMIN_KPI.mrr/1e3).toFixed(0)}K`} delta="+18.4%" />
-        <KPI label="Bookings" value={ADMIN_KPI.bookings.toLocaleString()} delta="+12.6%" />
-        <KPI label="Customers" value={ADMIN_KPI.users.toLocaleString()} delta="+9.2%" />
-        <KPI label="Active pros" value={ADMIN_KPI.pros.toLocaleString()} delta="+14.0%" />
+        <KPI label="GMV (live)" value={data ? `$${data.gmv.toLocaleString()}` : "…"} delta="all time" />
+        <KPI label="Bookings (live)" value={data ? data.bookings.toLocaleString() : "…"} delta="all time" />
+        <KPI label="Users (live)" value={data ? data.users.toLocaleString() : "…"} delta="all time" />
+        <KPI label="Active pros (live)" value={data ? data.activePros.toLocaleString() : "…"} delta={`${data?.pendingPros.length ?? 0} pending`} />
+        <KPI label="Net revenue (demo)" value={`$${(ADMIN_KPI.take/1e3).toFixed(0)}K`} delta="+24.1%" />
+        <KPI label="MRR (demo)" value={`$${(ADMIN_KPI.mrr/1e3).toFixed(0)}K`} delta="+18.4%" />
         <KPI label="Take rate" value="15.0%" delta="stable" />
-        <KPI label="NPS" value="71" delta="+4" />
+        <KPI label="NPS (demo)" value="71" delta="+4" />
       </div>
       <div className="grid lg:grid-cols-3 gap-4 mt-6">
         <div className="lg:col-span-2 rounded-2xl bg-background border border-border p-6">
@@ -94,7 +125,7 @@ function Overview() {
         <div className="rounded-2xl bg-background border border-border p-6">
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Pipeline</div>
           <div className="mt-3 space-y-3 text-sm">
-            {[["Pending review",PENDING_PROS.length],["Open disputes",DISPUTES.length],["License re-verify",6],["Refunds queue",3]].map(([l,n])=>(
+            {[["Pending review", data?.pendingPros.length ?? 0], ["Open disputes (demo)", DISPUTES.length], ["License re-verify", data?.pendingPros.length ?? 0], ["Refunds queue", 0]].map(([l,n])=>(
               <div key={l as string} className="flex justify-between"><span className="text-muted-foreground">{l}</span><span className="font-medium">{n}</span></div>
             ))}
           </div>
@@ -105,42 +136,80 @@ function Overview() {
 }
 
 function ProsTab() {
+  const { data, isLoading } = useAdminPros();
+  const setVerification = useSetVerification();
+  const [filter, setFilter] = useState<"pending" | "active" | "all">("pending");
+
+  const rows = (data ?? []).filter((r) =>
+    filter === "pending" ? !r.pro.verified : filter === "active" ? r.pro.verified : true,
+  );
+
+  const act = async (proId: string, action: "approve" | "reject", name: string) => {
+    const res = await setVerification.mutateAsync({ proId, action });
+    if (res.ok) {
+      toast(action === "approve" ? `${name} is now verified` : `${name}'s application was rejected`, {
+        description: action === "approve" ? "Their verified badge is live." : "Profile removed; the account reverts to customer.",
+      });
+    }
+  };
+
   return (
     <div>
       <h1 className="font-display text-3xl">Professionals</h1>
       <div className="mt-2 flex gap-2 text-xs">
-        {["Pending","Active","Suspended","All"].map((t,i)=>(<button key={t} className={`px-3 py-1.5 rounded-full ${i===0?"bg-ink text-white":"bg-background border border-border"}`}>{t}</button>))}
+        {([["pending","Pending"],["active","Active"],["all","All"]] as const).map(([key, label])=>(
+          <button key={key} onClick={()=>setFilter(key)} className={`px-3 py-1.5 rounded-full ${filter===key?"bg-ink text-white":"bg-background border border-border"}`}>{label}</button>
+        ))}
       </div>
       <div className="mt-5 rounded-2xl bg-background border border-border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-cream text-xs uppercase tracking-widest text-muted-foreground"><tr>
-            <th className="text-left p-3">Applicant</th><th className="text-left p-3">License</th><th className="text-left p-3">Stage</th><th className="text-left p-3">Submitted</th><th></th>
+            <th className="text-left p-3">Professional</th><th className="text-left p-3">License</th><th className="text-left p-3">Status</th><th className="text-left p-3">Contact</th><th></th>
           </tr></thead>
           <tbody className="divide-y divide-border">
-            {PENDING_PROS.map(p=>(
-              <tr key={p.id}>
+            {isLoading && (
+              <tr><td colSpan={5} className="p-8 text-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></td></tr>
+            )}
+            {rows.map(({ pro, email })=>(
+              <tr key={pro.id}>
                 <td className="p-3">
-                  <div className="font-medium">{p.name}</div>
-                  <div className="text-[11px] text-muted-foreground">{p.craft} · {p.city}</div>
+                  <div className="font-medium">{pro.name}</div>
+                  <div className="text-[11px] text-muted-foreground">{pro.craft} · {pro.city}</div>
                 </td>
-                <td className="p-3 font-mono text-[11px]">{p.license}</td>
-                <td className="p-3"><span className="px-2 py-1 rounded-full bg-gold/20 text-[10px] uppercase tracking-widest">{p.status}</span></td>
-                <td className="p-3 text-muted-foreground">{p.submitted}</td>
+                <td className="p-3 font-mono text-[11px]">{pro.certifications[0] ?? "—"}</td>
+                <td className="p-3">
+                  {pro.verified
+                    ? <span className="px-2 py-1 rounded-full bg-green-100 text-green-800 text-[10px] uppercase tracking-widest">Active</span>
+                    : <span className="px-2 py-1 rounded-full bg-gold/20 text-[10px] uppercase tracking-widest">License verify</span>}
+                </td>
+                <td className="p-3 text-muted-foreground text-[11px]">{email ?? "—"}</td>
                 <td className="p-3 text-right">
-                  <button className="h-8 w-8 rounded-full bg-ink text-white inline-grid place-items-center mr-1"><Check className="h-3.5 w-3.5" /></button>
-                  <button className="h-8 w-8 rounded-full border border-border inline-grid place-items-center"><X className="h-3.5 w-3.5" /></button>
+                  {!pro.verified && (
+                    <>
+                      <button
+                        onClick={() => act(pro.id, "approve", pro.name)}
+                        disabled={setVerification.isPending}
+                        aria-label={`Approve ${pro.name}`}
+                        className="h-8 w-8 rounded-full bg-ink text-white inline-grid place-items-center mr-1 disabled:opacity-40"
+                      >
+                        <Check className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => act(pro.id, "reject", pro.name)}
+                        disabled={setVerification.isPending}
+                        aria-label={`Reject ${pro.name}`}
+                        className="h-8 w-8 rounded-full border border-border inline-grid place-items-center disabled:opacity-40"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}
-            {PROS.slice(0,4).map(p=>(
-              <tr key={p.id}>
-                <td className="p-3"><div className="font-medium">{p.name}</div><div className="text-[11px] text-muted-foreground">{p.craft} · {p.city}</div></td>
-                <td className="p-3 font-mono text-[11px]">VERIFIED</td>
-                <td className="p-3"><span className="px-2 py-1 rounded-full bg-green-100 text-green-800 text-[10px] uppercase tracking-widest">Active</span></td>
-                <td className="p-3 text-muted-foreground">—</td>
-                <td className="p-3 text-right text-[11px] text-muted-foreground">Manage <ChevronDown className="h-3 w-3 inline" /></td>
-              </tr>
-            ))}
+            {!isLoading && rows.length === 0 && (
+              <tr><td colSpan={5} className="p-8 text-center text-muted-foreground text-sm">Nothing in this queue.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -189,8 +258,8 @@ function DisputesTab() {
               <div className="text-xs text-muted-foreground mt-1">{d.customer} vs {d.pro} · ${d.amount} · {d.opened}</div>
             </div>
             <div className="flex flex-col gap-2">
-              <button className="px-3 py-1.5 rounded-full bg-ink text-white text-xs">Refund</button>
-              <button className="px-3 py-1.5 rounded-full border border-border text-xs">Investigate</button>
+              <button onClick={() => toast("Refunds activate with Stripe", { description: "This queue is demo data until payments are connected." })} className="px-3 py-1.5 rounded-full bg-ink text-white text-xs">Refund</button>
+              <button onClick={() => toast("Case tooling is demo data", { description: "Real disputes flow in once the in-app dispute form is persisted." })} className="px-3 py-1.5 rounded-full border border-border text-xs">Investigate</button>
             </div>
           </div>
         ))}
@@ -200,6 +269,7 @@ function DisputesTab() {
 }
 
 function BookingsTab() {
+  const [statusFilter, setStatusFilter] = useState("All");
   const rows = [
     { id:"BK-92841", c:"K. Patel", p:"M. Vega", s:"Skin Fade + Beard", when:"Today 4:30 PM", amt:110, st:"Confirmed" },
     { id:"BK-92842", c:"R. Nguyen", p:"S. Tanaka", s:"Gel-X Full Set", when:"Today 5:00 PM", amt:95, st:"En route" },
@@ -212,7 +282,7 @@ function BookingsTab() {
     <div>
       <h1 className="font-display text-3xl">Bookings</h1>
       <div className="mt-2 flex gap-2 text-xs">
-        {["All","Upcoming","In progress","Completed","Cancelled"].map((t,i)=>(<button key={t} className={`px-3 py-1.5 rounded-full ${i===0?"bg-ink text-white":"bg-background border border-border"}`}>{t}</button>))}
+        {["All","Confirmed","En route","Completed"].map((t)=>(<button key={t} onClick={()=>setStatusFilter(t)} className={`px-3 py-1.5 rounded-full ${statusFilter===t?"bg-ink text-white":"bg-background border border-border"}`}>{t}</button>))}
       </div>
       <div className="mt-5 rounded-2xl bg-background border border-border overflow-hidden">
         <table className="w-full text-sm">
@@ -220,7 +290,7 @@ function BookingsTab() {
             <th className="text-left p-3">Booking</th><th className="text-left p-3">Customer</th><th className="text-left p-3">Pro</th><th className="text-left p-3">Service</th><th className="text-left p-3">When</th><th className="text-left p-3">Amount</th><th className="text-left p-3">Status</th>
           </tr></thead>
           <tbody className="divide-y divide-border">
-            {rows.map(r => (
+            {rows.filter(r => statusFilter === "All" || r.st === statusFilter).map(r => (
               <tr key={r.id}>
                 <td className="p-3 font-mono text-[11px]">{r.id}</td>
                 <td className="p-3">{r.c}</td>

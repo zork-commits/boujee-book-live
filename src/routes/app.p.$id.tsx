@@ -3,6 +3,7 @@ import { AppShell } from "@/components/boujee/AppShell";
 import { getPro } from "@/fn/pros";
 import { useFavorites, useToggleFavorite, fmtWhen } from "@/lib/api";
 import { ChevronLeft, Star, MapPin, BadgeCheck, MessageSquare, Heart, Share2, Award } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/p/$id")({
   loader: async ({ params }) => {
@@ -27,7 +28,26 @@ function ProfilePage() {
         <div className="absolute inset-x-0 top-0 p-4 flex items-center justify-between">
           <Link to="/app/search" className="h-9 w-9 rounded-full bg-background/90 grid place-items-center"><ChevronLeft className="h-4 w-4" /></Link>
           <div className="flex gap-2">
-            <button className="h-9 w-9 rounded-full bg-background/90 grid place-items-center"><Share2 className="h-4 w-4" /></button>
+            <button
+              onClick={async () => {
+                const url = window.location.href;
+                const payload = { title: `${pro.name} — Boujee Book`, text: `Book ${pro.name}, ${pro.craft} in ${pro.city}`, url };
+                if (navigator.share) {
+                  await navigator.share(payload).catch(() => {});
+                  return;
+                }
+                try {
+                  await navigator.clipboard.writeText(url);
+                  toast("Link copied", { description: `Share ${pro.name}'s profile anywhere.` });
+                } catch {
+                  toast("Share this profile", { description: url });
+                }
+              }}
+              aria-label="Share profile"
+              className="h-9 w-9 rounded-full bg-background/90 grid place-items-center"
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
             <button
               onClick={() => toggleFavorite.mutate(pro.id)}
               className="h-9 w-9 rounded-full bg-background/90 grid place-items-center"

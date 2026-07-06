@@ -4,6 +4,10 @@ import { AppShell } from "@/components/boujee/AppShell";
 import { ProTabs } from "@/components/boujee/ProTabs";
 import { usePro, useAddService, useDeleteService, useUpdateProProfile, useLogout } from "@/lib/api";
 import { Plus, Camera, Star, Trash2, Loader2, Check, LogOut, MapPin, BadgeCheck } from "lucide-react";
+import { toast } from "sonner";
+
+const uploadToast = () =>
+  toast("Photo uploads coming soon", { description: "Cover, avatar, and portfolio uploads open once media storage is connected." });
 
 export const Route = createFileRoute("/pro/profile")({ component: Studio });
 
@@ -55,7 +59,7 @@ function Studio() {
       <div className="relative">
         <img src={pro.cover} alt="" className="aspect-[16/9] w-full object-cover opacity-60" />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink to-transparent h-32" />
-        <button className="absolute bottom-3 right-3 h-9 px-3 rounded-full bg-ink/80 text-white text-xs inline-flex items-center gap-1.5"><Camera className="h-3.5 w-3.5" />Edit cover</button>
+        <button onClick={uploadToast} className="absolute bottom-3 right-3 h-9 px-3 rounded-full bg-ink/80 text-white text-xs inline-flex items-center gap-1.5"><Camera className="h-3.5 w-3.5" />Edit cover</button>
       </div>
       <div className="px-5 -mt-12 relative text-white">
         <img src={pro.avatar} alt="" className="h-20 w-20 rounded-2xl object-cover ring-4 ring-ink" />
@@ -146,7 +150,7 @@ function Studio() {
             {pro.portfolio.map((src,i)=>(
               <div key={i} className="aspect-square rounded-xl overflow-hidden bg-white/5"><img src={src} alt="" className="h-full w-full object-cover" /></div>
             ))}
-            <button className="aspect-square rounded-xl border border-dashed border-white/20 grid place-items-center"><Plus className="h-5 w-5 text-white/60" /></button>
+            <button onClick={uploadToast} aria-label="Add portfolio photo" className="aspect-square rounded-xl border border-dashed border-white/20 grid place-items-center"><Plus className="h-5 w-5 text-white/60" /></button>
           </div>
         </section>
       )}
