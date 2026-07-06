@@ -116,7 +116,7 @@ function ProfilePage() {
         </div>
       </section>
 
-      <div className="sticky bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl px-5 py-3 flex items-center gap-2">
+      <div className="sticky bottom-0 z-30 mt-auto border-t border-border bg-background/95 backdrop-blur-xl px-5 py-3 flex items-center gap-2">
         <Link to="/app/messages" search={{ to: pro.id }} className="h-12 w-12 rounded-full border border-border grid place-items-center"><MessageSquare className="h-4 w-4" /></Link>
         <Link to="/app/book" search={{ pro: pro.id }} className="flex-1 h-12 rounded-full bg-ink text-white grid place-items-center font-medium text-sm">Book — from ${pro.price}</Link>
       </div>

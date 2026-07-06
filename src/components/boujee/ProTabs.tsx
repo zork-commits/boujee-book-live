@@ -12,7 +12,7 @@ const TABS = [
 export function ProTabs() {
   const pathname = useLocation({ select: (l) => l.pathname });
   return (
-    <nav className="sticky bottom-0 z-30 mt-8 border-t border-white/10 bg-ink/95 backdrop-blur-xl">
+    <nav className="sticky bottom-0 z-30 mt-auto border-t border-white/10 bg-ink/95 backdrop-blur-xl">
       <div className="grid grid-cols-5 px-1 pt-2 pb-3">
         {TABS.map((t) => {
           const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);

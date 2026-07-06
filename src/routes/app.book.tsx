@@ -146,7 +146,7 @@ function Booking() {
         )}
       </div>
 
-      <div className="sticky bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur-xl px-5 py-3">
+      <div className="sticky bottom-0 z-30 mt-auto border-t border-border bg-background/95 backdrop-blur-xl px-5 py-3">
         {step < 4 ? (
           <button disabled={!canContinue} onClick={()=>setStep(step+1)} className="w-full h-12 rounded-full bg-ink text-white font-medium text-sm disabled:opacity-40">Continue</button>
         ) : (

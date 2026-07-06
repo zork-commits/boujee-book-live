@@ -11,7 +11,8 @@ export function AppShell({ children, dark = false }: { children: ReactNode; dark
             <span className="font-display tracking-[0.3em] text-[10px] opacity-60">BOUJEE BOOK</span>
             <span>●●●●●</span>
           </div>
-          <div className={`${dark ? "bg-ink text-white" : "bg-background"} min-h-screen lg:min-h-[820px] lg:max-h-[820px] lg:overflow-y-auto no-scrollbar`}>
+          {/* flex-col so short pages can push sticky footers (AppTabs/ProTabs) to the bottom via mt-auto */}
+          <div className={`${dark ? "bg-ink text-white" : "bg-background"} flex flex-col min-h-screen lg:min-h-[820px] lg:max-h-[820px] lg:overflow-y-auto no-scrollbar`}>
             {children}
           </div>
         </div>
