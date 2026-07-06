@@ -58,7 +58,7 @@ function Messages() {
                 <span className="font-medium text-sm truncate">{t.proName}</span>
                 <span className="text-[10px] text-muted-foreground shrink-0">{fmtWhen(t.conversation.lastMessageAt)}</span>
               </div>
-              <div className="text-xs text-muted-foreground truncate">{t.lastMessage?.body ?? "Say hi 👋"}</div>
+              <div className="text-xs text-muted-foreground truncate">{t.lastMessage?.body ?? "Say hi"}</div>
             </div>
           </button>
         ))}

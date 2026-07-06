@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/boujee/AppShell";
 import { UPCOMING } from "@/lib/mock";
-import { ChevronLeft, Phone, MessageSquare, Shield } from "lucide-react";
+import { ChevronLeft, Phone, MessageSquare, Shield, Scissors } from "lucide-react";
 
 export const Route = createFileRoute("/app/tracking")({
   component: Tracking,
@@ -21,7 +21,7 @@ function Tracking() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <div className="relative">
             <div className="h-16 w-16 rounded-full bg-gold/30 animate-ping absolute inset-0" />
-            <div className="h-16 w-16 rounded-full bg-gold border-4 border-background grid place-items-center"><span className="text-xl">💈</span></div>
+            <div className="h-16 w-16 rounded-full bg-gold border-4 border-background grid place-items-center"><Scissors className="h-6 w-6 text-ink" /></div>
           </div>
         </div>
       </div>

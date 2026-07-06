@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
 import { AppTabs } from "@/components/boujee/AppTabs";
 import { CATEGORIES } from "@/lib/mock";
+import { CategoryIcon } from "@/components/boujee/CategoryIcon";
 import { usePros } from "@/lib/api";
 import { Search, SlidersHorizontal, Star, MapPin, ChevronLeft, Loader2 } from "lucide-react";
 
@@ -34,7 +35,7 @@ function Discover() {
         <button onClick={()=>setCat(null)} className={`shrink-0 px-3.5 py-2 rounded-full text-xs border ${cat===null?"bg-ink text-white border-ink":"border-border"}`}>All</button>
         {CATEGORIES.map(c=>(
           <button key={c.key} onClick={()=>setCat(c.key)} className={`shrink-0 px-3.5 py-2 rounded-full text-xs border inline-flex items-center gap-1.5 ${cat===c.key?"bg-ink text-white border-ink":"border-border"}`}>
-            <span>{c.emoji}</span>{c.label}
+            <CategoryIcon category={c.key} className="h-3.5 w-3.5" />{c.label}
           </button>
         ))}
       </div>

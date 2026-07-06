@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/boujee/AppShell";
 import { AppTabs } from "@/components/boujee/AppTabs";
 import { CATEGORIES, TRENDING } from "@/lib/mock";
+import { CategoryIcon } from "@/components/boujee/CategoryIcon";
 import { usePros, useMyBookings, useFavorites, fmtWhen, initials } from "@/lib/api";
 import { Search, Bell, Star, MapPin, ChevronRight, Heart, Calendar, CreditCard, BadgeCheck } from "lucide-react";
 
@@ -54,7 +55,7 @@ function Home() {
         <div className="mt-3 grid grid-cols-4 gap-3">
           {CATEGORIES.slice(0,8).map(c=>(
             <Link key={c.key} to="/app/search" search={{ cat: c.key }} className="flex flex-col items-center gap-1.5 py-3 rounded-2xl bg-cream border border-border">
-              <span className="text-xl">{c.emoji}</span>
+              <CategoryIcon category={c.key} className="h-5 w-5 text-foreground/80" strokeWidth={1.75} />
               <span className="text-[10px]">{c.label}</span>
             </Link>
           ))}

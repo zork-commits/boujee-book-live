@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { WebNav } from "@/components/boujee/WebNav";
 import { WebFooter } from "@/components/boujee/WebFooter";
 import { CATEGORIES } from "@/lib/mock";
+import { CategoryIcon } from "@/components/boujee/CategoryIcon";
 
 export const Route = createFileRoute("/services")({
   head: () => ({ meta: [{ title: "Services — Boujee Book™" }, { name: "description", content: "Barbers, hairstylists, nails, makeup, lashes, esthetics, massage." }] }),
@@ -33,7 +34,7 @@ function Services() {
         <div className="mx-auto max-w-7xl px-6 grid grid-cols-2 md:grid-cols-4 gap-3">
           {CATEGORIES.map(c => (
             <Link key={c.key} to="/app/search" className="aspect-square rounded-3xl bg-cream border border-border p-6 flex flex-col justify-between hover:shadow-luxury">
-              <div className="text-4xl">{c.emoji}</div>
+              <CategoryIcon category={c.key} className="h-9 w-9 text-gold" strokeWidth={1.5} />
               <div className="font-display text-2xl">{c.label}</div>
             </Link>
           ))}

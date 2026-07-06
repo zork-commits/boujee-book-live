@@ -61,14 +61,14 @@ export const PROS: Pro[] = [
 ];
 
 export const CATEGORIES = [
-  { key: "barber", label: "Barbers", emoji: "💈" },
-  { key: "hair", label: "Hair", emoji: "💇" },
-  { key: "nails", label: "Nails", emoji: "💅" },
-  { key: "makeup", label: "Makeup", emoji: "💄" },
-  { key: "lash", label: "Lashes", emoji: "👁️" },
-  { key: "skin", label: "Skin", emoji: "✨" },
-  { key: "massage", label: "Massage", emoji: "🌿" },
-  { key: "brows", label: "Brows", emoji: "🪞" },
+  { key: "barber", label: "Barbers" },
+  { key: "hair", label: "Hair" },
+  { key: "nails", label: "Nails" },
+  { key: "makeup", label: "Makeup" },
+  { key: "lash", label: "Lashes" },
+  { key: "skin", label: "Skin" },
+  { key: "massage", label: "Massage" },
+  { key: "brows", label: "Brows" },
 ];
 
 export const TRENDING = [
@@ -93,7 +93,7 @@ export const PAST = [
 
 export const RECENT = [
   { id: "r1", type: "Booked", pro: PROS[1], note: "Signature Cut · tomorrow", at: "2m ago" },
-  { id: "r2", type: "Reviewed", pro: PROS[4], note: "Left a 5★ review", at: "1h ago" },
+  { id: "r2", type: "Reviewed", pro: PROS[4], note: "Left a 5-star review", at: "1h ago" },
   { id: "r3", type: "Favorited", pro: PROS[3], note: "Saved to favorites", at: "Yesterday" },
   { id: "r4", type: "Paid", pro: PROS[2], note: "$95 · Gel-X Full Set", at: "2d ago" },
 ];

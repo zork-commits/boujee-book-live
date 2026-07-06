@@ -19,7 +19,7 @@ function AI() {
   const [v, setV] = useState("");
   function send(text: string) {
     if (!text.trim()) return;
-    setMsgs(m=>[...m, {who:"me",t:text}, {who:"ai",t:"Based on your hair tone and shape, I'd start with a low-maintenance balayage and recommend Amara Cole in Brooklyn — she has 4.97★. Want me to hold Friday 11am?"}]);
+    setMsgs(m=>[...m, {who:"me",t:text}, {who:"ai",t:"Based on your hair tone and shape, I'd start with a low-maintenance balayage and recommend Amara Cole in Brooklyn — she has a 4.97 rating. Want me to hold Friday 11am?"}]);
     setV("");
   }
   return (

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { WebNav } from "@/components/boujee/WebNav";
 import { WebFooter } from "@/components/boujee/WebFooter";
+import { CategoryIcon } from "@/components/boujee/CategoryIcon";
 import { PROS, CATEGORIES } from "@/lib/mock";
 import { ArrowRight, Star, Shield, Sparkles, MapPin, Clock, ChevronRight } from "lucide-react";
 
@@ -36,9 +37,12 @@ function Landing() {
             <Link to="/professionals" className="inline-flex items-center gap-2 px-6 py-4 rounded-full border border-white/30">Become a Professional</Link>
           </div>
           <div className="mt-16 grid grid-cols-3 gap-6 max-w-2xl">
-            {[["6,240","Pros"],["142","Cities"],["4.97★","Avg rating"]].map(([v,l]) => (
+            {[["6,240","Pros"],["142","Cities"],["4.97","Avg rating"]].map(([v,l]) => (
               <div key={l}>
-                <div className="font-display text-3xl lg:text-4xl text-gold">{v}</div>
+                <div className="font-display text-3xl lg:text-4xl text-gold inline-flex items-center gap-2">
+                  {v}
+                  {l === "Avg rating" && <Star className="h-6 w-6 fill-gold text-gold" />}
+                </div>
                 <div className="text-xs uppercase tracking-widest text-white/50 mt-1">{l}</div>
               </div>
             ))}
@@ -59,7 +63,7 @@ function Landing() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {CATEGORIES.map(c => (
               <div key={c.key} className="aspect-square rounded-3xl bg-cream border border-border p-6 flex flex-col justify-between hover:shadow-luxury transition-all">
-                <div className="text-4xl">{c.emoji}</div>
+                <CategoryIcon category={c.key} className="h-9 w-9 text-gold" strokeWidth={1.5} />
                 <div>
                   <div className="font-display text-2xl">{c.label}</div>
                   <div className="text-xs text-muted-foreground mt-1">from $45</div>

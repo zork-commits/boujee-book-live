@@ -25,7 +25,7 @@ function About() {
             { k:"142", v:"Cities & growing" },
             { k:"$22M", v:"Series A" },
             { k:"71%", v:"Gross margin" },
-            { k:"4.97★", v:"Average rating" },
+            { k:"4.97", v:"Average rating" },
           ].map(s=>(
             <div key={s.v} className="rounded-3xl border border-border p-8">
               <div className="font-display text-5xl text-gold">{s.k}</div>
