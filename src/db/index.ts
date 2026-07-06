@@ -117,7 +117,10 @@ export function ensureDb(): Promise<void> {
     ready = (async () => {
       const statements = DDL.split(";").map((s) => s.trim()).filter(Boolean);
       for (const sql of statements) await client.execute(sql);
-      await seedIfEmpty(db);
+      // Demo seed: on by default in dev, opt-in via SEED_DEMO=1 in production.
+      const seedDemo = process.env.SEED_DEMO === "1" ||
+        (process.env.SEED_DEMO === undefined && process.env.NODE_ENV !== "production");
+      if (seedDemo) await seedIfEmpty(db);
     })().catch((err) => {
       ready = undefined; // allow retry on next request
       throw err;

@@ -41,7 +41,7 @@ function Pros() {
       </section>
       <section className="py-24 bg-ink text-white text-center">
         <div className="font-display text-5xl lg:text-7xl">$49/mo. Cancel anytime.</div>
-        <Link to="/pro" className="mt-10 inline-flex items-center gap-2 px-7 py-4 rounded-full bg-gold text-ink font-medium">Apply Now</Link>
+        <Link to="/pro/onboarding" className="mt-10 inline-flex items-center gap-2 px-7 py-4 rounded-full bg-gold text-ink font-medium">Apply Now</Link>
       </section>
       <WebFooter />
     </main>

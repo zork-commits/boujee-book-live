@@ -21,7 +21,10 @@ Track Them · Book Them · Love Them™
 - 5-step booking flow → creates a real booking (price/duration resolved server-side, never trusted from the client)
 - Bookings list: upcoming/past, cancel, 1-tap star rating (updates the pro's aggregate rating), rebook
 - Messaging: threads per customer↔pro, new-thread from a profile, 5s polling
+- Live-tracking screen driven by your actual next booking
 - Pro dashboard: today's schedule with confirm-pending action, earnings (day/week/month + weekly chart + top services), clients CRM with visits/LTV, day-by-day schedule view
+- **Self-serve pro onboarding**: any signed-in user applies at `/pro/onboarding` (craft, city, bio, license info, service menu) → pro profile is created, account upgraded, and they're instantly discoverable in consumer search
+- Pro Studio tab: edit bio, add/remove services (starting price auto-syncs), toggle in-shop/mobile
 
 ## Stack
 
@@ -36,7 +39,7 @@ npm install
 npm run dev        # http://localhost:8080
 ```
 
-First boot auto-creates `data/boujee.db`, runs DDL, and seeds demo data.
+First boot auto-creates `data/boujee.db`, runs DDL, and seeds demo data (dev only — see `SEED_DEMO` in [.env.example](.env.example)).
 
 **Demo accounts** (password `boujee123`):
 - `demo@boujeebook.app` — customer (Maya Reyes)
@@ -49,14 +52,15 @@ First boot auto-creates `data/boujee.db`, runs DDL, and seeds demo data.
 - `src/server/*` — **server-only** (sessions, password hashing). The Vite config blocks client imports of `**/server/**` — keep secrets-adjacent code here.
 - `src/db/*` — Drizzle schema, client, auto-migrate + seed (`ensureDb()`)
 - `src/lib/api.ts` — react-query hooks wrapping every server function
-- Env vars: `DATABASE_URL` (default `file:./data/boujee.db`; point at Turso/libsql for prod), `DATABASE_AUTH_TOKEN`
+- Env vars (see [.env.example](.env.example)): `DATABASE_URL` (default `file:./data/boujee.db`; point at Turso/libsql for prod), `DATABASE_AUTH_TOKEN`, `SEED_DEMO`
 
 ## Launch checklist (for the deploy agent)
 
 1. **Database**: set `DATABASE_URL` to a Turso (or any libsql) instance for production; the file DB is fine for a single node.
-2. **Payments**: the pay step is UI-only. Wire Stripe PaymentIntents in `createBooking` ([src/fn/bookings.ts](src/fn/bookings.ts)) and Stripe Connect for pro payouts (`/pro/payout`).
-3. **Seed data**: production should boot with an empty `pros` table — gate `seedIfEmpty` behind `NODE_ENV !== "production"` or a `SEED_DEMO=1` env var when you're ready.
-4. **Pro onboarding**: `/pro/onboarding` is a UI shell — persist applications and add an admin approval step.
+2. **Payments**: the pay step is UI-only. Wire Stripe PaymentIntents in `createBooking` ([src/fn/bookings.ts](src/fn/bookings.ts)) and Stripe Connect for pro payouts (`/pro/payout` shows the real balance but "cash out" is not wired).
+3. ~~Seed data~~ Done: demo seed only runs when `SEED_DEMO=1` or in non-production. Leave `SEED_DEMO` unset in prod for a clean DB.
+4. ~~Pro onboarding~~ Done: applications create a real pro profile (unverified). Remaining: file uploads for license/ID photos (needs object storage + Persona) and an admin review queue to flip `pros.verified`.
 5. **Admin/investor pages**: still on demo numbers; wire to real aggregates or put behind auth before launch.
 6. **Realtime**: messages poll every 5s; swap to websockets/SSE when needed.
 7. Remove the demo-credentials hint from the auth screen ([src/routes/auth.tsx](src/routes/auth.tsx)) before public launch.
+8. **Media uploads**: pro avatar/cover/portfolio use stock defaults — add object storage (S3/R2) for the Camera/Plus buttons in the Studio tab.

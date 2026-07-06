@@ -5,6 +5,7 @@ import { createBooking, myBookings, cancelBooking, submitReview, proBookings, se
 import { myConversations, getMessages, sendMessage } from "@/fn/messages";
 import { myFavorites, toggleFavorite } from "@/fn/favorites";
 import { proDashboard } from "@/fn/pro-dashboard";
+import { becomePro, updateProProfile, addService, deleteService } from "@/fn/pro-profile";
 
 export function useMe() {
   return useQuery({ queryKey: ["me"], queryFn: () => getMe(), staleTime: 60_000 });
@@ -132,6 +133,48 @@ export function useSetBookingStatus() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["proDashboard"] });
       qc.invalidateQueries({ queryKey: ["proBookings"] });
+    },
+  });
+}
+
+export function useBecomePro() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Parameters<typeof becomePro>[0]["data"]) => becomePro({ data }),
+    onSuccess: () => qc.invalidateQueries(),
+  });
+}
+
+export function useUpdateProProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Parameters<typeof updateProProfile>[0]["data"]) => updateProProfile({ data }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["proDashboard"] });
+      qc.invalidateQueries({ queryKey: ["pro"] });
+      qc.invalidateQueries({ queryKey: ["pros"] });
+    },
+  });
+}
+
+export function useAddService() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name: string; price: number; mins: number }) => addService({ data }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["pro"] });
+      qc.invalidateQueries({ queryKey: ["pros"] });
+    },
+  });
+}
+
+export function useDeleteService() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteService({ data: { id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["pro"] });
+      qc.invalidateQueries({ queryKey: ["pros"] });
     },
   });
 }

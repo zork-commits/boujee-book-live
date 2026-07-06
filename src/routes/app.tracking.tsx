@@ -1,14 +1,38 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/boujee/AppShell";
-import { UPCOMING } from "@/lib/mock";
-import { ChevronLeft, Phone, MessageSquare, Shield, Scissors } from "lucide-react";
+import { useMyBookings, fmtWhen } from "@/lib/api";
+import { ChevronLeft, Phone, MessageSquare, Shield, Scissors, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/app/tracking")({
   component: Tracking,
 });
 
 function Tracking() {
-  const a = UPCOMING[0];
+  const { data, isLoading } = useMyBookings();
+  const next = data?.upcoming[0];
+
+  if (isLoading) {
+    return (
+      <AppShell>
+        <div className="min-h-[600px] grid place-items-center text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin" /></div>
+      </AppShell>
+    );
+  }
+
+  if (!next) {
+    return (
+      <AppShell>
+        <div className="min-h-[600px] flex flex-col items-center justify-center gap-4 px-8 text-center">
+          <div className="text-sm text-muted-foreground">Nothing to track — book an appointment first.</div>
+          <Link to="/app/search" className="px-5 py-3 rounded-full bg-ink text-white text-sm font-medium">Find a pro</Link>
+        </div>
+      </AppShell>
+    );
+  }
+
+  const booked = new Date(next.booking.createdAt);
+  const fmtT = (d: Date) => d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+
   return (
     <AppShell>
       <div className="relative h-[55vh] lg:h-[420px] bg-cream overflow-hidden">
@@ -28,16 +52,16 @@ function Tracking() {
 
       <div className="px-5 -mt-8 relative">
         <div className="rounded-3xl bg-background border border-border shadow-luxury p-5">
-          <div className="text-[10px] uppercase tracking-widest text-gold">En route</div>
-          <div className="font-display text-3xl mt-1">Arriving in 7 min</div>
-          <div className="text-xs text-muted-foreground mt-1">{a.pro.name} · {a.service}</div>
+          <div className="text-[10px] uppercase tracking-widest text-gold">{next.booking.status === "confirmed" ? "Confirmed" : "Awaiting confirmation"}</div>
+          <div className="font-display text-3xl mt-1">{fmtWhen(next.booking.scheduledAt)}</div>
+          <div className="text-xs text-muted-foreground mt-1">{next.proName} · {next.booking.serviceName}</div>
 
           <div className="mt-5 space-y-3">
             {[
-              { l:"Booking confirmed", t:"3:48 PM", done:true },
-              { l:"Pro accepted", t:"3:50 PM", done:true },
-              { l:"En route", t:"4:18 PM", done:true, active:true },
-              { l:"Arrived", t:"—", done:false },
+              { l: "Booking placed", t: fmtT(booked), done: true },
+              { l: "Pro accepted", t: next.booking.status === "confirmed" ? "Confirmed" : "—", done: next.booking.status === "confirmed", active: next.booking.status !== "confirmed" },
+              { l: "En route", t: "—", done: false, active: next.booking.status === "confirmed" },
+              { l: "Arrived", t: "—", done: false },
             ].map((s,i)=>(
               <div key={i} className="flex items-center gap-3">
                 <div className={`h-3 w-3 rounded-full ${s.done?"bg-gold":"bg-border"} ${s.active?"ring-4 ring-gold/30":""}`} />
@@ -48,12 +72,12 @@ function Tracking() {
           </div>
 
           <div className="mt-5 flex items-center gap-3 pt-5 border-t border-border">
-            <img src={a.pro.avatar} alt="" className="h-12 w-12 rounded-full object-cover" />
+            <img src={next.proAvatar} alt="" className="h-12 w-12 rounded-full object-cover" />
             <div className="flex-1">
-              <div className="font-display text-base">{a.pro.name}</div>
-              <div className="text-[11px] text-muted-foreground">License #BARB-44912</div>
+              <div className="font-display text-base">{next.proName}</div>
+              <div className="text-[11px] text-muted-foreground">{next.proCraft} · {next.proCity}</div>
             </div>
-            <button className="h-10 w-10 rounded-full bg-cream grid place-items-center"><MessageSquare className="h-4 w-4" /></button>
+            <Link to="/app/messages" search={{ to: next.proId }} className="h-10 w-10 rounded-full bg-cream grid place-items-center"><MessageSquare className="h-4 w-4" /></Link>
             <button className="h-10 w-10 rounded-full bg-ink text-white grid place-items-center"><Phone className="h-4 w-4" /></button>
           </div>
 
