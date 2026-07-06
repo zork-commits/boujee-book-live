@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/boujee/AppShell";
-import { getPro } from "@/server/pros";
+import { getPro } from "@/fn/pros";
 import { useFavorites, useToggleFavorite, fmtWhen } from "@/lib/api";
 import { ChevronLeft, Star, MapPin, BadgeCheck, MessageSquare, Heart, Share2, Award } from "lucide-react";
 

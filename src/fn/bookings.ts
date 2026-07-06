@@ -4,7 +4,7 @@ import { nanoid } from "nanoid";
 import { z } from "zod";
 import { db, ensureDb } from "@/db";
 import { bookings, services, pros, reviews } from "@/db/schema";
-import { requireUser } from "./auth";
+import { requireUser } from "@/server/session";
 
 const proSummary = {
   proId: pros.id,

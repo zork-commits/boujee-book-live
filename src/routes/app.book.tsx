@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
-import { getPro } from "@/server/pros";
+import { getPro } from "@/fn/pros";
 import { useCreateBooking } from "@/lib/api";
 import { ChevronLeft, MapPin, Check, CreditCard, Loader2 } from "lucide-react";
 

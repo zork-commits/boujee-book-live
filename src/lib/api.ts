@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMe, login, logout, signup } from "@/server/auth";
-import { listPros, getPro, getCategoryCounts } from "@/server/pros";
-import { createBooking, myBookings, cancelBooking, submitReview, proBookings, setBookingStatus } from "@/server/bookings";
-import { myConversations, getMessages, sendMessage } from "@/server/messages";
-import { myFavorites, toggleFavorite } from "@/server/favorites";
-import { proDashboard } from "@/server/pro-dashboard";
+import { getMe, login, logout, signup } from "@/fn/auth";
+import { listPros, getPro, getCategoryCounts } from "@/fn/pros";
+import { createBooking, myBookings, cancelBooking, submitReview, proBookings, setBookingStatus } from "@/fn/bookings";
+import { myConversations, getMessages, sendMessage } from "@/fn/messages";
+import { myFavorites, toggleFavorite } from "@/fn/favorites";
+import { proDashboard } from "@/fn/pro-dashboard";
 
 export function useMe() {
   return useQuery({ queryKey: ["me"], queryFn: () => getMe(), staleTime: 60_000 });

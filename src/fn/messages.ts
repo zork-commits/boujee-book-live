@@ -4,7 +4,7 @@ import { nanoid } from "nanoid";
 import { z } from "zod";
 import { db, ensureDb } from "@/db";
 import { conversations, messages, pros } from "@/db/schema";
-import { requireUser, type SessionUser } from "./auth";
+import { requireUser, type SessionUser } from "@/server/session";
 
 async function assertParticipant(conversationId: string, user: SessionUser) {
   const [convo] = await db.select().from(conversations).where(eq(conversations.id, conversationId)).limit(1);

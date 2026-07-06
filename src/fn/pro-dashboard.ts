@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { eq, and, gte, lt, sql, desc } from "drizzle-orm";
 import { db } from "@/db";
 import { bookings, users, pros } from "@/db/schema";
-import { requireUser } from "./auth";
+import { requireUser } from "@/server/session";
 
 const startOfDay = (offsetDays = 0) => {
   const d = new Date();

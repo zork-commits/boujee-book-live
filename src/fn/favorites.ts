@@ -3,7 +3,7 @@ import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { favorites, pros } from "@/db/schema";
-import { requireUser } from "./auth";
+import { requireUser } from "@/server/session";
 
 export const myFavorites = createServerFn({ method: "GET" }).handler(async () => {
   const user = await requireUser();
