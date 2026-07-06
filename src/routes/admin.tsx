@@ -13,8 +13,8 @@ export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Boujee Book" }, { name: "robots", content: "noindex" }] }),
   beforeLoad: async ({ location }) => {
     const user = await getMe();
-    if (!user) throw redirect({ to: "/auth", search: { redirect: location.href } });
-    if (user.role !== "admin") throw redirect({ to: "/app" });
+    // Non-admins land on the auth screen so they can switch to the admin account.
+    if (!user || user.role !== "admin") throw redirect({ to: "/auth", search: { redirect: location.href } });
     return { user };
   },
   component: Admin,

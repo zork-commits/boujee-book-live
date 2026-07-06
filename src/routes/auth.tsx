@@ -36,8 +36,8 @@ function Auth() {
         setError(res.error);
         return;
       }
-      const target = redirect ?? (res.user.proId ? "/pro" : "/app");
-      nav({ href: target, replace: true });
+      const home = res.user.role === "admin" ? "/admin" : res.user.proId ? "/pro" : "/app";
+      nav({ href: redirect ?? home, replace: true });
     } catch {
       setError(mode === "login" ? "Could not sign in — check your details." : "Could not create your account.");
     }
