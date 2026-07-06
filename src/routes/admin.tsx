@@ -3,10 +3,10 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Sparkline } from "@/components/boujee/Sparkline";
 import { ADMIN_KPI, DISPUTES } from "@/lib/mock";
-import { getMe } from "@/fn/auth";
+import { getMe, logout as logoutFn } from "@/fn/auth";
 import { adminOverview, adminListPros, adminSetVerification } from "@/fn/admin";
 import { initials } from "@/lib/api";
-import { LayoutDashboard, ShieldCheck, Users, AlertTriangle, BarChart3, Search, Check, X, Calendar, CreditCard, Settings, Loader2 } from "lucide-react";
+import { LayoutDashboard, ShieldCheck, Users, AlertTriangle, BarChart3, Search, Check, X, Calendar, CreditCard, Settings, Loader2, LogOut } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -67,11 +67,29 @@ function Admin() {
         <div className="text-[10px] text-white/40">v1.0 · prod</div>
       </aside>
       <main className="flex-1 min-w-0">
-        <header className="border-b border-border bg-background px-6 py-4 flex items-center gap-4">
-          <div className="flex items-center gap-2 rounded-full bg-cream px-4 py-2 flex-1 max-w-md"><Search className="h-4 w-4 text-muted-foreground" /><input placeholder="Search bookings, pros, users…" className="bg-transparent text-sm outline-none flex-1" /></div>
-          <div className="text-xs text-muted-foreground">{user.name} · Admin</div>
+        <header className="border-b border-border bg-background px-4 md:px-6 py-4 flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2 rounded-full bg-cream px-4 py-2 flex-1 max-w-md"><Search className="h-4 w-4 text-muted-foreground" /><input placeholder="Search (use tab filters below)" className="bg-transparent text-sm outline-none flex-1" /></div>
+          <div className="flex-1 sm:hidden font-display tracking-[0.2em] text-sm">BOUJEE ADMIN</div>
+          <div className="hidden sm:block text-xs text-muted-foreground">{user.name} · Admin</div>
           <div className="h-9 w-9 rounded-full bg-ink text-white grid place-items-center text-xs">{initials(user.name)}</div>
+          <button
+            onClick={async () => { await logoutFn(); window.location.href = "/"; }}
+            aria-label="Sign out"
+            className="h-9 px-3 rounded-full border border-border text-xs inline-flex items-center gap-1.5"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Sign out</span>
+          </button>
         </header>
+
+        {/* Mobile tab strip — the sidebar is hidden below md, so navigation must live here */}
+        <nav className="md:hidden border-b border-border bg-background px-3 py-2 flex gap-1.5 overflow-x-auto no-scrollbar">
+          {NAV.map(n=>{const I=n.i;return(
+            <button key={n.id} onClick={()=>setTab(n.id)} className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs ${tab===n.id?"bg-ink text-white":"border border-border"}`}>
+              <I className="h-3.5 w-3.5" />{n.l}
+            </button>
+          )})}
+        </nav>
 
         <div className="p-6 lg:p-8">
           {tab==="dash" && <Overview />}
