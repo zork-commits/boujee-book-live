@@ -38,7 +38,7 @@ const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => 
           "script-src 'self' 'unsafe-inline'",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
           "font-src 'self' https://fonts.gstatic.com",
-          "img-src 'self' data: https://images.unsplash.com https://api.maptiler.com",
+          "img-src 'self' data: https://images.unsplash.com https://api.maptiler.com https://*.tile.openstreetmap.org",
           "connect-src 'self'",
           "frame-ancestors 'none'",
           "base-uri 'self'",

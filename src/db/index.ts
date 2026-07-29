@@ -157,6 +157,16 @@ CREATE TABLE IF NOT EXISTS blocks (
   created_at TEXT NOT NULL,
   PRIMARY KEY (blocker_id, blocked_user_id)
 );
+CREATE TABLE IF NOT EXISTS booking_locations (
+  booking_id TEXT NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+  role TEXT NOT NULL,
+  lat REAL NOT NULL,
+  lng REAL NOT NULL,
+  accuracy REAL,
+  heading REAL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (booking_id, role)
+);
 CREATE TABLE IF NOT EXISTS audit_log (
   id TEXT PRIMARY KEY,
   actor_id TEXT NOT NULL,

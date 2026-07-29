@@ -37,7 +37,7 @@ function Bookings() {
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold/20 text-ink h-fit capitalize">{a.booking.status}</span>
             </div>
             <div className="border-t border-border grid grid-cols-3 text-xs">
-              <Link to="/app/tracking" className="py-3 text-center inline-flex items-center justify-center gap-1"><MapPin className="h-3 w-3" />Track</Link>
+              <Link to="/app/tracking" search={{ booking: a.booking.id }} className="py-3 text-center inline-flex items-center justify-center gap-1"><MapPin className="h-3 w-3" />Track</Link>
               <Link to="/app/messages" search={{ to: a.proId }} className="py-3 border-x border-border inline-flex items-center justify-center gap-1"><MessageSquare className="h-3 w-3" />Message</Link>
               <button
                 onClick={()=>cancelBooking.mutate(a.booking.id)}

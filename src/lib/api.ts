@@ -12,6 +12,7 @@ import { submitDispute, myDisputes } from "@/fn/disputes";
 import { reportContent, blockUser } from "@/fn/moderation";
 import { exportMyData, deleteMyAccount, updateMyName, signOutEverywhere } from "@/fn/account";
 import { requestPasswordReset, resetPassword } from "@/fn/auth";
+import { shareLocation, stopSharing, getLiveTracking } from "@/fn/tracking";
 
 export function useMe() {
   return useQuery({ queryKey: ["me"], queryFn: () => getMe(), staleTime: 60_000 });
@@ -95,6 +96,7 @@ export function useThread(conversationId: string | null) {
     queryFn: () => getMessages({ data: { conversationId: conversationId! } }),
     enabled: conversationId != null,
     refetchInterval: 5_000, // light polling until websockets land
+    refetchIntervalInBackground: true,
   });
 }
 
@@ -135,10 +137,11 @@ export function useProBookings(range?: { from: string; to: string }) {
 export function useSetBookingStatus() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: { id: string; status: "confirmed" | "completed" | "cancelled" }) => setBookingStatus({ data }),
+    mutationFn: (data: { id: string; status: "confirmed" | "en_route" | "arrived" | "completed" | "cancelled" }) => setBookingStatus({ data }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["proDashboard"] });
       qc.invalidateQueries({ queryKey: ["proBookings"] });
+      qc.invalidateQueries({ queryKey: ["liveTracking"] });
     },
   });
 }
@@ -281,6 +284,31 @@ export function useRequestPasswordReset() {
 
 export function useResetPassword() {
   return useMutation({ mutationFn: (data: { token: string; password: string }) => resetPassword({ data }) });
+}
+
+export function useLiveTracking(bookingId: string | null) {
+  return useQuery({
+    queryKey: ["liveTracking", bookingId],
+    queryFn: () => getLiveTracking({ data: { bookingId: bookingId! } }),
+    enabled: bookingId != null,
+    refetchInterval: 4_000, // DoorDash-style live polling
+    refetchIntervalInBackground: true, // keep the map moving even when the tab loses focus
+  });
+}
+
+export function useShareLocation() {
+  return useMutation({
+    mutationFn: (data: { bookingId: string; lat: number; lng: number; accuracy?: number; heading?: number }) =>
+      shareLocation({ data }),
+  });
+}
+
+export function useStopSharing() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (bookingId: string) => stopSharing({ data: { bookingId } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["liveTracking"] }),
+  });
 }
 
 /** "Today · 4:30 PM", "Fri · 11:00 AM", or "Jun 12" for older dates. */

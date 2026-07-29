@@ -58,7 +58,7 @@ export const bookings = sqliteTable("bookings", {
   price: integer("price").notNull(),
   mins: integer("mins").notNull(),
   scheduledAt: text("scheduled_at").notNull(), // ISO datetime
-  status: text("status", { enum: ["pending", "confirmed", "completed", "cancelled"] }).notNull().default("pending"),
+  status: text("status", { enum: ["pending", "confirmed", "en_route", "arrived", "completed", "cancelled"] }).notNull().default("pending"),
   location: text("location", { enum: ["mobile", "shop"] }).notNull().default("shop"),
   address: text("address"),
   notes: text("notes"),
@@ -165,6 +165,24 @@ export const blocks = sqliteTable(
     createdAt: text("created_at").notNull(),
   },
   (t) => [primaryKey({ columns: [t.blockerId, t.blockedUserId] })],
+);
+
+/**
+ * Live location during an active booking — one row per participant, upserted.
+ * Rows are deleted when the booking completes or cancels; this is ephemeral data.
+ */
+export const bookingLocations = sqliteTable(
+  "booking_locations",
+  {
+    bookingId: text("booking_id").notNull().references(() => bookings.id, { onDelete: "cascade" }),
+    role: text("role", { enum: ["customer", "pro"] }).notNull(),
+    lat: real("lat").notNull(),
+    lng: real("lng").notNull(),
+    accuracy: real("accuracy"),
+    heading: real("heading"),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.bookingId, t.role] })],
 );
 
 export const auditLog = sqliteTable("audit_log", {

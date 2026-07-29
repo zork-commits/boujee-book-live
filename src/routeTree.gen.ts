@@ -26,6 +26,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProIndexRouteImport } from './routes/pro.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as ProTrackRouteImport } from './routes/pro.track'
 import { Route as ProScheduleRouteImport } from './routes/pro.schedule'
 import { Route as ProProfileRouteImport } from './routes/pro.profile'
 import { Route as ProPayoutRouteImport } from './routes/pro.payout'
@@ -130,6 +131,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
+} as any)
+const ProTrackRoute = ProTrackRouteImport.update({
+  id: '/track',
+  path: '/track',
+  getParentRoute: () => ProRoute,
 } as any)
 const ProScheduleRoute = ProScheduleRouteImport.update({
   id: '/schedule',
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/pro/payout': typeof ProPayoutRoute
   '/pro/profile': typeof ProProfileRoute
   '/pro/schedule': typeof ProScheduleRoute
+  '/pro/track': typeof ProTrackRoute
   '/app/': typeof AppIndexRoute
   '/pro/': typeof ProIndexRoute
   '/app/p/$id': typeof AppPIdRoute
@@ -297,6 +304,7 @@ export interface FileRoutesByTo {
   '/pro/payout': typeof ProPayoutRoute
   '/pro/profile': typeof ProProfileRoute
   '/pro/schedule': typeof ProScheduleRoute
+  '/pro/track': typeof ProTrackRoute
   '/app': typeof AppIndexRoute
   '/pro': typeof ProIndexRoute
   '/app/p/$id': typeof AppPIdRoute
@@ -336,6 +344,7 @@ export interface FileRoutesById {
   '/pro/payout': typeof ProPayoutRoute
   '/pro/profile': typeof ProProfileRoute
   '/pro/schedule': typeof ProScheduleRoute
+  '/pro/track': typeof ProTrackRoute
   '/app/': typeof AppIndexRoute
   '/pro/': typeof ProIndexRoute
   '/app/p/$id': typeof AppPIdRoute
@@ -376,6 +385,7 @@ export interface FileRouteTypes {
     | '/pro/payout'
     | '/pro/profile'
     | '/pro/schedule'
+    | '/pro/track'
     | '/app/'
     | '/pro/'
     | '/app/p/$id'
@@ -412,6 +422,7 @@ export interface FileRouteTypes {
     | '/pro/payout'
     | '/pro/profile'
     | '/pro/schedule'
+    | '/pro/track'
     | '/app'
     | '/pro'
     | '/app/p/$id'
@@ -450,6 +461,7 @@ export interface FileRouteTypes {
     | '/pro/payout'
     | '/pro/profile'
     | '/pro/schedule'
+    | '/pro/track'
     | '/app/'
     | '/pro/'
     | '/app/p/$id'
@@ -593,6 +605,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/pro/track': {
+      id: '/pro/track'
+      path: '/track'
+      fullPath: '/pro/track'
+      preLoaderRoute: typeof ProTrackRouteImport
+      parentRoute: typeof ProRoute
     }
     '/pro/schedule': {
       id: '/pro/schedule'
@@ -773,6 +792,7 @@ interface ProRouteChildren {
   ProPayoutRoute: typeof ProPayoutRoute
   ProProfileRoute: typeof ProProfileRoute
   ProScheduleRoute: typeof ProScheduleRoute
+  ProTrackRoute: typeof ProTrackRoute
   ProIndexRoute: typeof ProIndexRoute
 }
 
@@ -783,6 +803,7 @@ const ProRouteChildren: ProRouteChildren = {
   ProPayoutRoute: ProPayoutRoute,
   ProProfileRoute: ProProfileRoute,
   ProScheduleRoute: ProScheduleRoute,
+  ProTrackRoute: ProTrackRoute,
   ProIndexRoute: ProIndexRoute,
 }
 

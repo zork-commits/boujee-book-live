@@ -35,7 +35,7 @@ export const proDashboard = createServerFn({ method: "GET" }).handler(async () =
       .where(
         and(
           eq(bookings.proId, proId),
-          sql`${bookings.status} in ('completed', 'confirmed')`,
+          sql`${bookings.status} in ('completed', 'confirmed', 'en_route', 'arrived')`,
           gte(bookings.scheduledAt, from),
           lt(bookings.scheduledAt, to),
         ),

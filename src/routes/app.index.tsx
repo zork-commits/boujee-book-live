@@ -75,7 +75,7 @@ function Home() {
           <div className="px-5"><SectionHead title="Upcoming" link="/app/bookings" /></div>
           <div className="mt-3 flex gap-3 px-5 overflow-x-auto no-scrollbar pb-1">
             {bookings!.upcoming.map(a=>(
-              <Link key={a.booking.id} to="/app/tracking" className="shrink-0 w-[280px] rounded-2xl bg-ink text-white p-4">
+              <Link key={a.booking.id} to="/app/tracking" search={{ booking: a.booking.id }} className="shrink-0 w-[280px] rounded-2xl bg-ink text-white p-4">
                 <div className="flex items-center gap-3">
                   <img src={a.proAvatar} alt={a.proName} className="h-11 w-11 rounded-full object-cover" />
                   <div className="flex-1 min-w-0">

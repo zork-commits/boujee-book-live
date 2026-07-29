@@ -97,8 +97,12 @@ function ProHome() {
                   >
                     <Check className="h-3 w-3" />Confirm
                   </button>
+                ) : ["confirmed", "en_route", "arrived"].includes(a.booking.status) ? (
+                  <Link to="/pro/track" search={{ booking: a.booking.id }} className="mt-0.5 text-[10px] text-gold inline-flex items-center gap-1">
+                    Track →
+                  </Link>
                 ) : (
-                  <div className="text-[10px] text-white/40 capitalize">{a.booking.status}</div>
+                  <div className="text-[10px] text-white/40 capitalize">{a.booking.status.replace("_", " ")}</div>
                 )}
               </div>
             </div>

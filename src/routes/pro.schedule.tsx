@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
 import { ProTabs } from "@/components/boujee/ProTabs";
@@ -51,10 +51,10 @@ function Schedule() {
             const top = (at.getHours() - 8) * 32 + (at.getMinutes() / 60) * 32;
             if (top < 0 || top > HOURS.length * 32) return null;
             return (
-              <div key={a.booking.id} className="absolute left-12 right-0 rounded-xl bg-gold/90 text-ink p-2 text-[11px] shadow-luxury" style={{ top, minHeight: (a.booking.mins/30)*16 + 16 }}>
+              <Link key={a.booking.id} to="/pro/track" search={{ booking: a.booking.id }} className="absolute left-12 right-0 rounded-xl bg-gold/90 text-ink p-2 text-[11px] shadow-luxury block" style={{ top, minHeight: (a.booking.mins/30)*16 + 16 }}>
                 <div className="font-medium">{a.clientName}</div>
                 <div className="opacity-70">{a.booking.serviceName} · ${a.booking.price}{a.booking.status === "pending" ? " · pending" : ""}</div>
-              </div>
+              </Link>
             );
           })}
           {active.length === 0 && (

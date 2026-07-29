@@ -3,7 +3,7 @@ import { eq, and, desc, asc, gte, lt, ne, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { db, ensureDb } from "@/db";
-import { bookings, services, pros, reviews, proHours } from "@/db/schema";
+import { bookings, services, pros, reviews, proHours, bookingLocations } from "@/db/schema";
 import { requireUser } from "@/server/session";
 import { notify } from "@/server/notify";
 import { allow, RATE_LIMITED_ERROR } from "@/server/rate-limit";
@@ -248,9 +248,9 @@ export const proBookings = createServerFn({ method: "GET" })
       .orderBy(asc(bookings.scheduledAt));
   });
 
-/** Pro-side: confirm/complete/cancel a booking on their own calendar. */
+/** Pro-side journey flow: confirmed → en_route → arrived → completed (cancel anywhere). */
 export const setBookingStatus = createServerFn({ method: "POST" })
-  .inputValidator(z.object({ id: z.string(), status: z.enum(["confirmed", "completed", "cancelled"]) }))
+  .inputValidator(z.object({ id: z.string(), status: z.enum(["confirmed", "en_route", "arrived", "completed", "cancelled"]) }))
   .handler(async ({ data }) => {
     const user = await requireUser();
     if (!user.proId) throw new Response("Not a pro account", { status: 403 });
@@ -261,12 +261,22 @@ export const setBookingStatus = createServerFn({ method: "POST" })
       .limit(1);
     if (!booking) return { ok: false };
     await db.update(bookings).set({ status: data.status }).where(eq(bookings.id, booking.id));
-    const titles = { confirmed: "Booking confirmed", completed: "Appointment completed", cancelled: "Booking declined" } as const;
+    // Location data is ephemeral — gone the moment the booking is no longer active.
+    if (data.status === "completed" || data.status === "cancelled") {
+      await db.delete(bookingLocations).where(eq(bookingLocations.bookingId, booking.id));
+    }
+    const titles = {
+      confirmed: "Booking confirmed",
+      en_route: "Your pro is on the way",
+      arrived: "Your pro has arrived",
+      completed: "Appointment completed",
+      cancelled: "Booking declined",
+    } as const;
     await notify(booking.customerId, {
       type: "booking",
       title: titles[data.status],
       body: `${booking.serviceName} · ${new Date(booking.scheduledAt).toLocaleString("en-US", { weekday: "short", hour: "numeric", minute: "2-digit" })}`,
-      href: data.status === "completed" ? "/app/bookings" : "/app/tracking",
+      href: data.status === "completed" ? "/app/bookings" : `/app/tracking?booking=${booking.id}`,
     });
     return { ok: true };
   });

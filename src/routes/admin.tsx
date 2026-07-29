@@ -394,7 +394,7 @@ function BookingsTab() {
     <div>
       <h1 className="font-display text-3xl">Bookings</h1>
       <div className="mt-2 flex gap-2 text-xs">
-        {["all","pending","confirmed","completed","cancelled"].map((t)=>(
+        {["all","pending","confirmed","en_route","arrived","completed","cancelled"].map((t)=>(
           <button key={t} onClick={()=>setStatusFilter(t)} className={`px-3 py-1.5 rounded-full capitalize ${statusFilter===t?"bg-ink text-white":"bg-background border border-border"}`}>{t}</button>
         ))}
       </div>
