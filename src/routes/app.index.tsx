@@ -3,9 +3,8 @@ import { AppShell } from "@/components/boujee/AppShell";
 import { AppTabs } from "@/components/boujee/AppTabs";
 import { CATEGORIES, TRENDING } from "@/lib/mock";
 import { CategoryIcon } from "@/components/boujee/CategoryIcon";
-import { usePros, useMyBookings, useFavorites, fmtWhen, initials } from "@/lib/api";
+import { usePros, useMyBookings, useFavorites, useUnreadCount, fmtWhen, initials } from "@/lib/api";
 import { Search, Bell, Star, MapPin, ChevronRight, Calendar, CreditCard, BadgeCheck, Sparkles } from "lucide-react";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/")({
   head: () => ({ meta: [{ title: "Boujee Book — Find Your Next Professional" }] }),
@@ -34,14 +33,7 @@ function Home() {
           <Link to="/app/ai" aria-label="Boujee AI concierge" className="h-10 w-10 grid place-items-center rounded-full bg-ink text-gold">
             <Sparkles className="h-4 w-4" />
           </Link>
-          <button
-            onClick={() => toast("You're all caught up", { description: "Booking updates and pro replies will show up here." })}
-            aria-label="Notifications"
-            className="h-10 w-10 grid place-items-center rounded-full border border-border relative"
-          >
-            <Bell className="h-4 w-4" />
-            <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-gold" />
-          </button>
+          <NotificationBell />
         </div>
       </header>
 
@@ -185,6 +177,20 @@ function Home() {
       <div className="h-4" />
       <AppTabs />
     </AppShell>
+  );
+}
+
+function NotificationBell() {
+  const { data: unread } = useUnreadCount();
+  return (
+    <Link to="/app/notifications" aria-label="Notifications" className="h-10 w-10 grid place-items-center rounded-full border border-border relative">
+      <Bell className="h-4 w-4" />
+      {(unread ?? 0) > 0 && (
+        <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-gold text-ink text-[9px] font-semibold grid place-items-center">
+          {unread! > 9 ? "9+" : unread}
+        </span>
+      )}
+    </Link>
   );
 }
 

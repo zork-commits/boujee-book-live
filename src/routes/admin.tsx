@@ -4,8 +4,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Sparkline } from "@/components/boujee/Sparkline";
 import { ADMIN_KPI, DISPUTES } from "@/lib/mock";
 import { getMe, logout as logoutFn } from "@/fn/auth";
-import { adminOverview, adminListPros, adminSetVerification } from "@/fn/admin";
-import { initials } from "@/lib/api";
+import {
+  adminOverview, adminListPros, adminSetVerification,
+  adminListUsers, adminSetUserStatus, adminListBookings, adminCancelBooking,
+  adminListReports, adminSetReportStatus, adminAuditLog,
+} from "@/fn/admin";
+import { adminListDisputes } from "@/fn/disputes";
+import { adminResolveDispute } from "@/fn/admin";
+import { initials, fmtWhen } from "@/lib/api";
 import { LayoutDashboard, ShieldCheck, Users, AlertTriangle, BarChart3, Search, Check, X, Calendar, CreditCard, Settings, Loader2, LogOut } from "lucide-react";
 import { toast } from "sonner";
 
@@ -236,22 +242,57 @@ function ProsTab() {
 }
 
 function UsersTab() {
-  const rows = Array.from({length:8}).map((_,i)=>({n:["Maya R.","James T.","Eli C.","Priya S.","Devon H.","Kira P.","Ren A.","Owen B."][i], e:"user@boujeebook.app", s:[12,4,18,2,7,22,3,9][i], lv:["Elite","Free","Elite","Free","Free","Elite","Free","Elite"][i]}));
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({ queryKey: ["adminUsers"], queryFn: () => adminListUsers() });
+  const setStatus = useMutation({
+    mutationFn: (d: { userId: string; status: "active" | "suspended" }) => adminSetUserStatus({ data: d }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["adminUsers"] }),
+  });
+  const [q, setQ] = useState("");
+  const rows = (data ?? []).filter((u) => !q || u.name.toLowerCase().includes(q.toLowerCase()) || u.email.toLowerCase().includes(q.toLowerCase()));
+
   return (
     <div>
       <h1 className="font-display text-3xl">Users</h1>
-      <div className="mt-5 rounded-2xl bg-background border border-border overflow-hidden">
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Search name or email…"
+        className="mt-3 w-full max-w-sm px-4 py-2.5 rounded-full bg-background border border-border text-sm outline-none"
+      />
+      <div className="mt-4 rounded-2xl bg-background border border-border overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-cream text-xs uppercase tracking-widest text-muted-foreground"><tr>
-            <th className="text-left p-3">Customer</th><th className="text-left p-3">Email</th><th className="text-left p-3">Bookings</th><th className="text-left p-3">Plan</th>
+            <th className="text-left p-3">User</th><th className="text-left p-3">Role</th><th className="text-left p-3">Bookings</th><th className="text-left p-3">Status</th><th></th>
           </tr></thead>
           <tbody className="divide-y divide-border">
-            {rows.map((r,i)=>(<tr key={i}>
-              <td className="p-3 font-medium">{r.n}</td>
-              <td className="p-3 text-muted-foreground">{r.e}</td>
-              <td className="p-3">{r.s}</td>
-              <td className="p-3">{r.lv==="Elite"?<span className="px-2 py-0.5 rounded-full bg-gold/20 text-[10px] uppercase tracking-widest">Elite</span>:<span className="text-muted-foreground text-xs">Free</span>}</td>
+            {isLoading && <tr><td colSpan={5} className="p-8 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-muted-foreground" /></td></tr>}
+            {rows.map((u)=>(<tr key={u.id}>
+              <td className="p-3"><div className="font-medium">{u.name}</div><div className="text-[11px] text-muted-foreground">{u.email}</div></td>
+              <td className="p-3 capitalize text-muted-foreground">{u.role}</td>
+              <td className="p-3">{u.bookingCount}</td>
+              <td className="p-3">
+                {u.status === "suspended"
+                  ? <span className="px-2 py-0.5 rounded-full bg-destructive/15 text-destructive text-[10px] uppercase tracking-widest">Suspended</span>
+                  : <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-[10px] uppercase tracking-widest">Active</span>}
+              </td>
+              <td className="p-3 text-right">
+                {u.role !== "admin" && (
+                  <button
+                    onClick={async () => {
+                      const res = await setStatus.mutateAsync({ userId: u.id, status: u.status === "suspended" ? "active" : "suspended" });
+                      if (!res.ok) toast(res.error);
+                      else toast(u.status === "suspended" ? `${u.name} reinstated` : `${u.name} suspended`, { description: u.status === "suspended" ? "They can sign in again." : "All their sessions were ended." });
+                    }}
+                    disabled={setStatus.isPending}
+                    className={`px-3 py-1.5 rounded-full text-xs ${u.status === "suspended" ? "bg-ink text-white" : "border border-destructive/40 text-destructive"} disabled:opacity-40`}
+                  >
+                    {u.status === "suspended" ? "Reinstate" : "Suspend"}
+                  </button>
+                )}
+              </td>
             </tr>))}
+            {!isLoading && rows.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-sm text-muted-foreground">No users match.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -260,25 +301,78 @@ function UsersTab() {
 }
 
 function DisputesTab() {
+  const qc = useQueryClient();
+  const { data: disputes, isLoading } = useQuery({ queryKey: ["adminDisputes"], queryFn: () => adminListDisputes() });
+  const { data: reports } = useQuery({ queryKey: ["adminReports"], queryFn: () => adminListReports() });
+  const resolve = useMutation({
+    mutationFn: (d: { id: string; status: "resolved" | "dismissed"; resolution: string }) => adminResolveDispute({ data: d }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["adminDisputes"] }),
+  });
+  const setReport = useMutation({
+    mutationFn: (d: { id: string; status: "actioned" | "dismissed" }) => adminSetReportStatus({ data: d }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["adminReports"] }),
+  });
+
+  const act = async (id: string, status: "resolved" | "dismissed") => {
+    const resolution = window.prompt(status === "resolved" ? "Resolution note (sent to the customer):" : "Reason for dismissal (sent to the customer):");
+    if (!resolution?.trim()) return;
+    const res = await resolve.mutateAsync({ id, status, resolution: resolution.trim() });
+    toast(res.ok ? "Dispute updated — customer notified" : res.error);
+  };
+
+  const open = (disputes ?? []).filter((d) => d.dispute.status === "open");
+  const closed = (disputes ?? []).filter((d) => d.dispute.status !== "open");
+  const openReports = (reports ?? []).filter((r) => r.report.status === "open");
+
   return (
     <div>
       <h1 className="font-display text-3xl">Disputes</h1>
+      {isLoading && <div className="mt-8 grid place-items-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin" /></div>}
       <div className="mt-5 space-y-3">
-        {DISPUTES.map(d=>(
+        {!isLoading && open.length === 0 && <div className="rounded-2xl bg-background border border-border p-6 text-sm text-muted-foreground">No open disputes.</div>}
+        {open.map(({ dispute: d, customerName, proName, serviceName, amount })=>(
           <div key={d.id} className="rounded-2xl bg-background border border-border p-5 flex items-start gap-4">
-            <div className={`mt-1 h-8 w-8 rounded-full grid place-items-center ${d.priority==="Critical"?"bg-destructive text-white":d.priority==="High"?"bg-gold text-ink":"bg-cream"}`}><AlertTriangle className="h-4 w-4" /></div>
-            <div className="flex-1">
+            <div className="mt-1 h-8 w-8 rounded-full grid place-items-center bg-gold text-ink"><AlertTriangle className="h-4 w-4" /></div>
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs">{d.booking}</span>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{d.priority} priority</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{fmtWhen(d.createdAt)}</span>
               </div>
               <div className="font-display text-lg mt-1">{d.reason}</div>
-              <div className="text-xs text-muted-foreground mt-1">{d.customer} vs {d.pro} · ${d.amount} · {d.opened}</div>
+              <div className="text-xs text-muted-foreground mt-1">{customerName} vs {proName} · {serviceName} · ${amount}</div>
+              <p className="text-xs mt-2 bg-cream rounded-xl p-3">{d.details}</p>
             </div>
-            <div className="flex flex-col gap-2">
-              <button onClick={() => toast("Refunds activate with Stripe", { description: "This queue is demo data until payments are connected." })} className="px-3 py-1.5 rounded-full bg-ink text-white text-xs">Refund</button>
-              <button onClick={() => toast("Case tooling is demo data", { description: "Real disputes flow in once the in-app dispute form is persisted." })} className="px-3 py-1.5 rounded-full border border-border text-xs">Investigate</button>
+            <div className="flex flex-col gap-2 shrink-0">
+              <button onClick={() => act(d.id, "resolved")} disabled={resolve.isPending} className="px-3 py-1.5 rounded-full bg-ink text-white text-xs disabled:opacity-40">Resolve</button>
+              <button onClick={() => act(d.id, "dismissed")} disabled={resolve.isPending} className="px-3 py-1.5 rounded-full border border-border text-xs disabled:opacity-40">Dismiss</button>
             </div>
+          </div>
+        ))}
+        {closed.length > 0 && (
+          <details className="rounded-2xl bg-background border border-border p-4 text-sm">
+            <summary className="cursor-pointer text-muted-foreground">{closed.length} closed dispute{closed.length === 1 ? "" : "s"}</summary>
+            <div className="mt-3 space-y-2">
+              {closed.map(({ dispute: d, customerName, proName }) => (
+                <div key={d.id} className="flex items-center justify-between text-xs border-t border-border pt-2">
+                  <span>{d.reason} · {customerName} vs {proName}</span>
+                  <span className="capitalize text-muted-foreground">{d.status}</span>
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
+      </div>
+
+      <h2 className="font-display text-2xl mt-10">Content reports</h2>
+      <div className="mt-3 space-y-2">
+        {openReports.length === 0 && <div className="rounded-2xl bg-background border border-border p-4 text-sm text-muted-foreground">No open reports.</div>}
+        {openReports.map(({ report: r, reporterName }) => (
+          <div key={r.id} className="rounded-2xl bg-background border border-border p-4 flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="text-sm"><span className="capitalize font-medium">{r.targetType}</span> reported by {reporterName}</div>
+              <div className="text-[11px] text-muted-foreground">{r.reason}{r.details ? ` — ${r.details}` : ""} · target {r.targetId.slice(0, 12)}…</div>
+            </div>
+            <button onClick={async () => { await setReport.mutateAsync({ id: r.id, status: "actioned" }); toast("Marked actioned"); }} className="px-3 py-1.5 rounded-full bg-ink text-white text-xs">Actioned</button>
+            <button onClick={async () => { await setReport.mutateAsync({ id: r.id, status: "dismissed" }); toast("Dismissed"); }} className="px-3 py-1.5 rounded-full border border-border text-xs">Dismiss</button>
           </div>
         ))}
       </div>
@@ -287,38 +381,56 @@ function DisputesTab() {
 }
 
 function BookingsTab() {
-  const [statusFilter, setStatusFilter] = useState("All");
-  const rows = [
-    { id:"BK-92841", c:"K. Patel", p:"M. Vega", s:"Skin Fade + Beard", when:"Today 4:30 PM", amt:110, st:"Confirmed" },
-    { id:"BK-92842", c:"R. Nguyen", p:"S. Tanaka", s:"Gel-X Full Set", when:"Today 5:00 PM", amt:95, st:"En route" },
-    { id:"BK-92840", c:"J. Adler", p:"L. Okafor", s:"Soft Glam", when:"Today 6:15 PM", amt:220, st:"Confirmed" },
-    { id:"BK-92839", c:"M. Cole", p:"A. Cole", s:"Balayage", when:"Tomorrow 10:00 AM", amt:360, st:"Confirmed" },
-    { id:"BK-92833", c:"T. Reyes", p:"N. Bennett", s:"90 min Sports", when:"Yesterday", amt:230, st:"Completed" },
-    { id:"BK-92829", c:"D. Park", p:"R. Fernandez", s:"Volume Set", when:"Jun 22", amt:260, st:"Completed" },
-  ];
+  const qc = useQueryClient();
+  const [statusFilter, setStatusFilter] = useState("all");
+  const { data, isLoading } = useQuery({ queryKey: ["adminBookings"], queryFn: () => adminListBookings() });
+  const cancel = useMutation({
+    mutationFn: (id: string) => adminCancelBooking({ data: { id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["adminBookings"] }),
+  });
+  const rows = (data ?? []).filter((r) => statusFilter === "all" || r.booking.status === statusFilter);
+
   return (
     <div>
       <h1 className="font-display text-3xl">Bookings</h1>
       <div className="mt-2 flex gap-2 text-xs">
-        {["All","Confirmed","En route","Completed"].map((t)=>(<button key={t} onClick={()=>setStatusFilter(t)} className={`px-3 py-1.5 rounded-full ${statusFilter===t?"bg-ink text-white":"bg-background border border-border"}`}>{t}</button>))}
+        {["all","pending","confirmed","completed","cancelled"].map((t)=>(
+          <button key={t} onClick={()=>setStatusFilter(t)} className={`px-3 py-1.5 rounded-full capitalize ${statusFilter===t?"bg-ink text-white":"bg-background border border-border"}`}>{t}</button>
+        ))}
       </div>
-      <div className="mt-5 rounded-2xl bg-background border border-border overflow-hidden">
+      <div className="mt-5 rounded-2xl bg-background border border-border overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-cream text-xs uppercase tracking-widest text-muted-foreground"><tr>
-            <th className="text-left p-3">Booking</th><th className="text-left p-3">Customer</th><th className="text-left p-3">Pro</th><th className="text-left p-3">Service</th><th className="text-left p-3">When</th><th className="text-left p-3">Amount</th><th className="text-left p-3">Status</th>
+            <th className="text-left p-3">Customer</th><th className="text-left p-3">Pro</th><th className="text-left p-3">Service</th><th className="text-left p-3">When</th><th className="text-left p-3">Amount</th><th className="text-left p-3">Status</th><th></th>
           </tr></thead>
           <tbody className="divide-y divide-border">
-            {rows.filter(r => statusFilter === "All" || r.st === statusFilter).map(r => (
-              <tr key={r.id}>
-                <td className="p-3 font-mono text-[11px]">{r.id}</td>
-                <td className="p-3">{r.c}</td>
-                <td className="p-3">{r.p}</td>
-                <td className="p-3 text-muted-foreground">{r.s}</td>
-                <td className="p-3 text-muted-foreground">{r.when}</td>
-                <td className="p-3 font-medium">${r.amt}</td>
-                <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-cream text-[10px] uppercase tracking-widest">{r.st}</span></td>
+            {isLoading && <tr><td colSpan={7} className="p-8 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-muted-foreground" /></td></tr>}
+            {rows.map(({ booking: b, customerName, proName }) => (
+              <tr key={b.id}>
+                <td className="p-3">{customerName}</td>
+                <td className="p-3">{proName}</td>
+                <td className="p-3 text-muted-foreground">{b.serviceName}</td>
+                <td className="p-3 text-muted-foreground">{fmtWhen(b.scheduledAt)}</td>
+                <td className="p-3 font-medium">${b.price}</td>
+                <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-cream text-[10px] uppercase tracking-widest">{b.status}</span></td>
+                <td className="p-3 text-right">
+                  {b.status !== "cancelled" && b.status !== "completed" && (
+                    <button
+                      onClick={async () => {
+                        if (!window.confirm(`Cancel ${customerName}'s ${b.serviceName}? Both sides are notified.`)) return;
+                        const res = await cancel.mutateAsync(b.id);
+                        toast(res.ok ? "Booking cancelled — both parties notified" : res.error);
+                      }}
+                      disabled={cancel.isPending}
+                      className="px-3 py-1.5 rounded-full border border-destructive/40 text-destructive text-xs disabled:opacity-40"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
+            {!isLoading && rows.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-sm text-muted-foreground">No bookings in this state.</td></tr>}
           </tbody>
         </table>
       </div>
@@ -365,6 +477,27 @@ function PaymentsTab() {
   );
 }
 
+function AuditLogSection() {
+  const { data } = useQuery({ queryKey: ["adminAudit"], queryFn: () => adminAuditLog() });
+  return (
+    <div className="mt-8">
+      <h2 className="font-display text-2xl">Audit log</h2>
+      <div className="mt-3 rounded-2xl bg-background border border-border divide-y divide-border">
+        {(data ?? []).map((e) => (
+          <div key={e.id} className="p-3 flex items-center gap-3 text-sm">
+            <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-cream">{e.action}</span>
+            <span className="flex-1 text-muted-foreground text-xs truncate">
+              {e.actorName} → {e.targetType ?? ""} {e.targetId?.slice(0, 14) ?? ""}
+            </span>
+            <span className="text-[10px] text-muted-foreground shrink-0">{fmtWhen(e.createdAt)}</span>
+          </div>
+        ))}
+        {(data?.length ?? 0) === 0 && <div className="p-4 text-sm text-muted-foreground">No privileged actions recorded yet.</div>}
+      </div>
+    </div>
+  );
+}
+
 function SettingsTab() {
   const groups = [
     { t:"Platform", rows:[["Customer Basic","$9.99/mo"],["Customer Elite","$29.99/mo"],["Pro Basic","$9.99/mo"],["Pro Elite","$29.99/mo"]] },
@@ -386,6 +519,7 @@ function SettingsTab() {
           </div>
         ))}
       </div>
+      <AuditLogSection />
     </div>
   );
 }

@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
 import { AppTabs } from "@/components/boujee/AppTabs";
-import { useConversations, useThread, useSendMessage, usePro, fmtWhen } from "@/lib/api";
-import { Send, ChevronLeft, Phone, ShieldCheck, Loader2 } from "lucide-react";
+import { useConversations, useThread, useSendMessage, usePro, useReportContent, fmtWhen } from "@/lib/api";
+import { Send, ChevronLeft, Phone, ShieldCheck, Loader2, Flag } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/messages")({
@@ -82,6 +82,7 @@ function Thread({ conversationId, proId, meId, onBack, onCreated }: {
   const { data: messages } = useThread(conversationId);
   const { data: pro } = usePro(proId ?? "");
   const sendMessage = useSendMessage();
+  const report = useReportContent();
   const [draft, setDraft] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -108,6 +109,17 @@ function Thread({ conversationId, proId, meId, onBack, onCreated }: {
           <div className="font-medium text-sm truncate">{pro?.name ?? "…"}</div>
           <div className="text-[10px] text-muted-foreground flex items-center gap-1"><ShieldCheck className="h-3 w-3 text-gold" />Verified{pro ? ` · ${pro.craft}` : ""}</div>
         </div>
+        <button
+          onClick={async () => {
+            if (!conversationId) return;
+            const res = await report.mutateAsync({ targetType: "conversation", targetId: conversationId, reason: "Reported from chat" });
+            toast(res.ok ? "Conversation reported" : res.error, res.ok ? { description: "Our trust team will review this thread." } : undefined);
+          }}
+          aria-label="Report conversation"
+          className="h-9 w-9 rounded-full border border-border grid place-items-center"
+        >
+          <Flag className="h-3.5 w-3.5" />
+        </button>
         <button
           onClick={() => toast("Calls unlock after a confirmed booking", { description: "Numbers stay private — message your pro here in the meantime." })}
           aria-label="Call"

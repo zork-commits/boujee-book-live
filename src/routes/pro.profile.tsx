@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
 import { ProTabs } from "@/components/boujee/ProTabs";
-import { usePro, useAddService, useDeleteService, useUpdateProProfile, useLogout } from "@/lib/api";
+import { usePro, useAddService, useDeleteService, useUpdateProProfile, useLogout, useMyHours, useUpdateHours } from "@/lib/api";
 import { Plus, Camera, Star, Trash2, Loader2, Check, LogOut, MapPin, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 
@@ -156,6 +156,11 @@ function Studio() {
       )}
 
       <section className="mt-6 px-5 text-white">
+        <h2 className="font-display text-xl mb-3">Availability</h2>
+        <HoursEditor />
+      </section>
+
+      <section className="mt-6 px-5 text-white">
         <h2 className="font-display text-xl mb-3">Booking preferences</h2>
         <div className="rounded-2xl bg-white/5 border border-white/10 divide-y divide-white/5">
           <Toggle
@@ -180,6 +185,64 @@ function Studio() {
       </button>
       <ProTabs />
     </AppShell>
+  );
+}
+
+const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const HOUR_OPTIONS = Array.from({ length: 29 }, (_, i) => 6 * 60 + i * 30); // 06:00–20:00 in 30-min steps
+const fmtMin = (m: number) => {
+  const h = Math.floor(m / 60), min = m % 60;
+  const ampm = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(min).padStart(2, "0")} ${ampm}`;
+};
+
+function HoursEditor() {
+  const { data: hours } = useMyHours();
+  const updateHours = useUpdateHours();
+  if (!hours) return <div className="rounded-2xl bg-white/5 border border-white/10 p-4 text-white/40 text-sm">Loading hours…</div>;
+
+  return (
+    <div className="rounded-2xl bg-white/5 border border-white/10 divide-y divide-white/5">
+      {hours.map((h) => (
+        <div key={h.dow} className="flex items-center gap-2 p-3 text-sm">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={h.enabled}
+            aria-label={`${DAY_NAMES[h.dow]} ${h.enabled ? "open" : "closed"}`}
+            onClick={() => updateHours.mutate({ dow: h.dow, enabled: !h.enabled, startMin: h.startMin, endMin: h.endMin })}
+            className={`h-5 w-9 rounded-full transition-colors relative shrink-0 ${h.enabled ? "bg-gold" : "bg-white/15"}`}
+          >
+            <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-ink transition-all ${h.enabled ? "left-[18px]" : "left-0.5"}`} />
+          </button>
+          <span className="w-20 shrink-0">{DAY_NAMES[h.dow].slice(0, 3)}</span>
+          {h.enabled ? (
+            <div className="flex items-center gap-1.5 flex-1 justify-end">
+              <select
+                value={h.startMin}
+                onChange={(e) => updateHours.mutate({ dow: h.dow, enabled: true, startMin: Number(e.target.value), endMin: h.endMin })}
+                className="bg-white/10 rounded-lg px-2 py-1.5 text-xs outline-none"
+                aria-label={`${DAY_NAMES[h.dow]} opening time`}
+              >
+                {HOUR_OPTIONS.filter((m) => m < h.endMin).map((m) => <option key={m} value={m} className="text-ink">{fmtMin(m)}</option>)}
+              </select>
+              <span className="text-white/40 text-xs">–</span>
+              <select
+                value={h.endMin}
+                onChange={(e) => updateHours.mutate({ dow: h.dow, enabled: true, startMin: h.startMin, endMin: Number(e.target.value) })}
+                className="bg-white/10 rounded-lg px-2 py-1.5 text-xs outline-none"
+                aria-label={`${DAY_NAMES[h.dow]} closing time`}
+              >
+                {HOUR_OPTIONS.filter((m) => m > h.startMin).map((m) => <option key={m} value={m} className="text-ink">{fmtMin(m)}</option>)}
+              </select>
+            </div>
+          ) : (
+            <span className="flex-1 text-right text-white/40 text-xs">Closed</span>
+          )}
+        </div>
+      ))}
+    </div>
   );
 }
 

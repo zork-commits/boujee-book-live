@@ -103,11 +103,82 @@ CREATE TABLE IF NOT EXISTS favorites (
   created_at TEXT NOT NULL,
   PRIMARY KEY (customer_id, pro_id)
 );
+CREATE TABLE IF NOT EXISTS notifications (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  body TEXT,
+  href TEXT,
+  read_at TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS disputes (
+  id TEXT PRIMARY KEY,
+  booking_id TEXT NOT NULL REFERENCES bookings(id),
+  customer_id TEXT NOT NULL REFERENCES users(id),
+  pro_id TEXT NOT NULL REFERENCES pros(id),
+  reason TEXT NOT NULL,
+  details TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'open',
+  resolution TEXT,
+  created_at TEXT NOT NULL,
+  resolved_at TEXT
+);
+CREATE TABLE IF NOT EXISTS password_resets (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  used_at TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS pro_hours (
+  pro_id TEXT NOT NULL REFERENCES pros(id) ON DELETE CASCADE,
+  dow INTEGER NOT NULL,
+  enabled INTEGER NOT NULL DEFAULT 1,
+  start_min INTEGER NOT NULL DEFAULT 540,
+  end_min INTEGER NOT NULL DEFAULT 1140,
+  PRIMARY KEY (pro_id, dow)
+);
+CREATE TABLE IF NOT EXISTS reports (
+  id TEXT PRIMARY KEY,
+  reporter_id TEXT NOT NULL REFERENCES users(id),
+  target_type TEXT NOT NULL,
+  target_id TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  details TEXT,
+  status TEXT NOT NULL DEFAULT 'open',
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS blocks (
+  blocker_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  blocked_user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (blocker_id, blocked_user_id)
+);
+CREATE TABLE IF NOT EXISTS audit_log (
+  id TEXT PRIMARY KEY,
+  actor_id TEXT NOT NULL,
+  action TEXT NOT NULL,
+  target_type TEXT,
+  target_id TEXT,
+  meta TEXT,
+  created_at TEXT NOT NULL
+);
 CREATE INDEX IF NOT EXISTS idx_bookings_customer ON bookings(customer_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_pro ON bookings(pro_id);
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, read_at);
+CREATE INDEX IF NOT EXISTS idx_disputes_status ON disputes(status);
+CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
 `;
+
+/** Column additions for databases created before these features existed. */
+const MIGRATIONS = [
+  `ALTER TABLE users ADD COLUMN status TEXT NOT NULL DEFAULT 'active'`,
+];
 
 let ready: Promise<void> | undefined;
 
@@ -117,6 +188,18 @@ export function ensureDb(): Promise<void> {
     ready = (async () => {
       const statements = DDL.split(";").map((s) => s.trim()).filter(Boolean);
       for (const sql of statements) await client.execute(sql);
+      for (const sql of MIGRATIONS) {
+        await client.execute(sql).catch((err: unknown) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          if (!msg.includes("duplicate column name")) throw err;
+        });
+      }
+      // Every pro needs working-hours rows; backfill defaults (9:00–19:00 daily) for any missing.
+      await client.execute(`
+        INSERT OR IGNORE INTO pro_hours (pro_id, dow, enabled, start_min, end_min)
+        SELECT pros.id, d.dow, 1, 540, 1140 FROM pros
+        CROSS JOIN (SELECT 0 AS dow UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) d
+      `);
       // Demo seed: on by default in dev, opt-in via SEED_DEMO=1 in production.
       const seedDemo = process.env.SEED_DEMO === "1" ||
         (process.env.SEED_DEMO === undefined && process.env.NODE_ENV !== "production");

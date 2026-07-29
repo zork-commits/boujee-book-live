@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
 import { useLogin, useSignup } from "@/lib/api";
@@ -110,9 +110,17 @@ function Auth() {
             {mode === "login" ? "Sign in" : "Create my account"}
           </button>
 
-          <div className="mt-4 text-center text-[11px] text-white/40">
-            Demo: demo@boujeebook.app · Pro: marcus@boujeebook.app · password “boujee123”
-          </div>
+          {mode === "login" && (
+            <div className="mt-4 text-center">
+              <Link to="/reset" className="text-[11px] text-white/50 underline underline-offset-4">Forgot password?</Link>
+            </div>
+          )}
+
+          {import.meta.env.DEV && (
+            <div className="mt-4 text-center text-[11px] text-white/40">
+              Demo: demo@boujeebook.app · Pro: marcus@boujeebook.app · password “boujee123”
+            </div>
+          )}
         </form>
       </div>
     </AppShell>

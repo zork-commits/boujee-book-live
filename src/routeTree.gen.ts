@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as ResetRouteImport } from './routes/reset'
 import { Route as ProfessionalsRouteImport } from './routes/professionals'
 import { Route as ProRouteImport } from './routes/pro'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -35,12 +36,14 @@ import { Route as AppTrackingRouteImport } from './routes/app.tracking'
 import { Route as AppSubscriptionRouteImport } from './routes/app.subscription'
 import { Route as AppSearchRouteImport } from './routes/app.search'
 import { Route as AppSafetyRouteImport } from './routes/app.safety'
+import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
 import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppMeRouteImport } from './routes/app.me'
 import { Route as AppDisputeRouteImport } from './routes/app.dispute'
 import { Route as AppBookingsRouteImport } from './routes/app.bookings'
 import { Route as AppBookRouteImport } from './routes/app.book'
 import { Route as AppAiRouteImport } from './routes/app.ai'
+import { Route as AppAccountRouteImport } from './routes/app.account'
 import { Route as AppPIdRouteImport } from './routes/app.p.$id'
 
 const TermsRoute = TermsRouteImport.update({
@@ -51,6 +54,11 @@ const TermsRoute = TermsRouteImport.update({
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetRoute = ResetRouteImport.update({
+  id: '/reset',
+  path: '/reset',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfessionalsRoute = ProfessionalsRouteImport.update({
@@ -173,6 +181,11 @@ const AppSafetyRoute = AppSafetyRouteImport.update({
   path: '/safety',
   getParentRoute: () => AppRoute,
 } as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMessagesRoute = AppMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
@@ -203,6 +216,11 @@ const AppAiRoute = AppAiRouteImport.update({
   path: '/ai',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAccountRoute = AppAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPIdRoute = AppPIdRouteImport.update({
   id: '/p/$id',
   path: '/p/$id',
@@ -222,14 +240,17 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/pro': typeof ProRouteWithChildren
   '/professionals': typeof ProfessionalsRoute
+  '/reset': typeof ResetRoute
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
+  '/app/account': typeof AppAccountRoute
   '/app/ai': typeof AppAiRoute
   '/app/book': typeof AppBookRoute
   '/app/bookings': typeof AppBookingsRoute
   '/app/dispute': typeof AppDisputeRoute
   '/app/me': typeof AppMeRoute
   '/app/messages': typeof AppMessagesRoute
+  '/app/notifications': typeof AppNotificationsRoute
   '/app/safety': typeof AppSafetyRoute
   '/app/search': typeof AppSearchRoute
   '/app/subscription': typeof AppSubscriptionRoute
@@ -255,14 +276,17 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/professionals': typeof ProfessionalsRoute
+  '/reset': typeof ResetRoute
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
+  '/app/account': typeof AppAccountRoute
   '/app/ai': typeof AppAiRoute
   '/app/book': typeof AppBookRoute
   '/app/bookings': typeof AppBookingsRoute
   '/app/dispute': typeof AppDisputeRoute
   '/app/me': typeof AppMeRoute
   '/app/messages': typeof AppMessagesRoute
+  '/app/notifications': typeof AppNotificationsRoute
   '/app/safety': typeof AppSafetyRoute
   '/app/search': typeof AppSearchRoute
   '/app/subscription': typeof AppSubscriptionRoute
@@ -291,14 +315,17 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/pro': typeof ProRouteWithChildren
   '/professionals': typeof ProfessionalsRoute
+  '/reset': typeof ResetRoute
   '/services': typeof ServicesRoute
   '/terms': typeof TermsRoute
+  '/app/account': typeof AppAccountRoute
   '/app/ai': typeof AppAiRoute
   '/app/book': typeof AppBookRoute
   '/app/bookings': typeof AppBookingsRoute
   '/app/dispute': typeof AppDisputeRoute
   '/app/me': typeof AppMeRoute
   '/app/messages': typeof AppMessagesRoute
+  '/app/notifications': typeof AppNotificationsRoute
   '/app/safety': typeof AppSafetyRoute
   '/app/search': typeof AppSearchRoute
   '/app/subscription': typeof AppSubscriptionRoute
@@ -328,14 +355,17 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/pro'
     | '/professionals'
+    | '/reset'
     | '/services'
     | '/terms'
+    | '/app/account'
     | '/app/ai'
     | '/app/book'
     | '/app/bookings'
     | '/app/dispute'
     | '/app/me'
     | '/app/messages'
+    | '/app/notifications'
     | '/app/safety'
     | '/app/search'
     | '/app/subscription'
@@ -361,14 +391,17 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/professionals'
+    | '/reset'
     | '/services'
     | '/terms'
+    | '/app/account'
     | '/app/ai'
     | '/app/book'
     | '/app/bookings'
     | '/app/dispute'
     | '/app/me'
     | '/app/messages'
+    | '/app/notifications'
     | '/app/safety'
     | '/app/search'
     | '/app/subscription'
@@ -396,14 +429,17 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/pro'
     | '/professionals'
+    | '/reset'
     | '/services'
     | '/terms'
+    | '/app/account'
     | '/app/ai'
     | '/app/book'
     | '/app/bookings'
     | '/app/dispute'
     | '/app/me'
     | '/app/messages'
+    | '/app/notifications'
     | '/app/safety'
     | '/app/search'
     | '/app/subscription'
@@ -432,6 +468,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ProRoute: typeof ProRouteWithChildren
   ProfessionalsRoute: typeof ProfessionalsRoute
+  ResetRoute: typeof ResetRoute
   ServicesRoute: typeof ServicesRoute
   TermsRoute: typeof TermsRoute
 }
@@ -450,6 +487,13 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset': {
+      id: '/reset'
+      path: '/reset'
+      fullPath: '/reset'
+      preLoaderRoute: typeof ResetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/professionals': {
@@ -620,6 +664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSafetyRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/notifications': {
+      id: '/app/notifications'
+      path: '/notifications'
+      fullPath: '/app/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/messages': {
       id: '/app/messages'
       path: '/messages'
@@ -662,6 +713,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAiRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/account': {
+      id: '/app/account'
+      path: '/account'
+      fullPath: '/app/account'
+      preLoaderRoute: typeof AppAccountRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/p/$id': {
       id: '/app/p/$id'
       path: '/p/$id'
@@ -673,12 +731,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAccountRoute: typeof AppAccountRoute
   AppAiRoute: typeof AppAiRoute
   AppBookRoute: typeof AppBookRoute
   AppBookingsRoute: typeof AppBookingsRoute
   AppDisputeRoute: typeof AppDisputeRoute
   AppMeRoute: typeof AppMeRoute
   AppMessagesRoute: typeof AppMessagesRoute
+  AppNotificationsRoute: typeof AppNotificationsRoute
   AppSafetyRoute: typeof AppSafetyRoute
   AppSearchRoute: typeof AppSearchRoute
   AppSubscriptionRoute: typeof AppSubscriptionRoute
@@ -688,12 +748,14 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAccountRoute: AppAccountRoute,
   AppAiRoute: AppAiRoute,
   AppBookRoute: AppBookRoute,
   AppBookingsRoute: AppBookingsRoute,
   AppDisputeRoute: AppDisputeRoute,
   AppMeRoute: AppMeRoute,
   AppMessagesRoute: AppMessagesRoute,
+  AppNotificationsRoute: AppNotificationsRoute,
   AppSafetyRoute: AppSafetyRoute,
   AppSearchRoute: AppSearchRoute,
   AppSubscriptionRoute: AppSubscriptionRoute,
@@ -739,6 +801,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ProRoute: ProRouteWithChildren,
   ProfessionalsRoute: ProfessionalsRoute,
+  ResetRoute: ResetRoute,
   ServicesRoute: ServicesRoute,
   TermsRoute: TermsRoute,
 }

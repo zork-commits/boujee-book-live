@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
 import { AppTabs } from "@/components/boujee/AppTabs";
 import { ChevronLeft, ShieldCheck } from "lucide-react";
-import { useMyBookings, fmtWhen } from "@/lib/api";
+import { useMyBookings, useSubmitDispute, fmtWhen } from "@/lib/api";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/dispute")({
@@ -20,6 +20,7 @@ function Dispute() {
   const [reason, setReason] = useState(REASONS[0]);
   const [details, setDetails] = useState("");
   const [sent, setSent] = useState(false);
+  const submitDispute = useSubmitDispute();
 
   if (sent) return (
     <AppShell>
@@ -73,14 +74,17 @@ function Dispute() {
           + Attach photo evidence
         </button>
         <button
-          onClick={() => {
+          onClick={async () => {
             if (!booking) { toast("Pick the booking this is about"); return; }
             if (!details.trim()) { toast("Add a short description so our team can act fast"); return; }
+            const res = await submitDispute.mutateAsync({ bookingId: booking, reason, details: details.trim() });
+            if (!res.ok) { toast(res.error); return; }
             setSent(true);
           }}
-          className="w-full py-4 rounded-full bg-ink text-white font-medium"
+          disabled={submitDispute.isPending}
+          className="w-full py-4 rounded-full bg-ink text-white font-medium disabled:opacity-60"
         >
-          Submit report
+          {submitDispute.isPending ? "Submitting…" : "Submit report"}
         </button>
       </div>
       <AppTabs />

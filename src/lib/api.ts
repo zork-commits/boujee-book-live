@@ -5,7 +5,13 @@ import { createBooking, myBookings, cancelBooking, submitReview, proBookings, se
 import { myConversations, getMessages, sendMessage } from "@/fn/messages";
 import { myFavorites, toggleFavorite } from "@/fn/favorites";
 import { proDashboard } from "@/fn/pro-dashboard";
-import { becomePro, updateProProfile, addService, deleteService } from "@/fn/pro-profile";
+import { becomePro, updateProProfile, addService, deleteService, getMyHours, updateHours } from "@/fn/pro-profile";
+import { bookableSlots } from "@/fn/bookings";
+import { myNotifications, unreadCount, markAllRead } from "@/fn/notifications";
+import { submitDispute, myDisputes } from "@/fn/disputes";
+import { reportContent, blockUser } from "@/fn/moderation";
+import { exportMyData, deleteMyAccount, updateMyName, signOutEverywhere } from "@/fn/account";
+import { requestPasswordReset, resetPassword } from "@/fn/auth";
 
 export function useMe() {
   return useQuery({ queryKey: ["me"], queryFn: () => getMe(), staleTime: 60_000 });
@@ -177,6 +183,104 @@ export function useDeleteService() {
       qc.invalidateQueries({ queryKey: ["pros"] });
     },
   });
+}
+
+export function useBookableSlots(args: { proId: string; serviceId: string; date: string } | null) {
+  return useQuery({
+    queryKey: ["slots", args],
+    queryFn: () => bookableSlots({ data: args! }),
+    enabled: args != null && !!args.serviceId && !!args.date,
+  });
+}
+
+export function useMyHours() {
+  return useQuery({ queryKey: ["myHours"], queryFn: () => getMyHours() });
+}
+
+export function useUpdateHours() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { dow: number; enabled: boolean; startMin: number; endMin: number }) => updateHours({ data }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["myHours"] });
+      qc.invalidateQueries({ queryKey: ["slots"] });
+    },
+  });
+}
+
+export function useNotifications() {
+  return useQuery({ queryKey: ["notifications"], queryFn: () => myNotifications() });
+}
+
+export function useUnreadCount() {
+  return useQuery({ queryKey: ["unreadCount"], queryFn: () => unreadCount(), refetchInterval: 30_000 });
+}
+
+export function useMarkAllRead() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => markAllRead(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["notifications"] });
+      qc.invalidateQueries({ queryKey: ["unreadCount"] });
+    },
+  });
+}
+
+export function useSubmitDispute() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { bookingId: string; reason: string; details: string }) => submitDispute({ data }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["disputes"] }),
+  });
+}
+
+export function useMyDisputes() {
+  return useQuery({ queryKey: ["disputes"], queryFn: () => myDisputes() });
+}
+
+export function useReportContent() {
+  return useMutation({
+    mutationFn: (data: { targetType: "pro" | "user" | "review" | "message" | "conversation"; targetId: string; reason: string; details?: string }) =>
+      reportContent({ data }),
+  });
+}
+
+export function useBlockUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => blockUser({ data: { userId } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["conversations"] }),
+  });
+}
+
+export function useExportMyData() {
+  return useMutation({ mutationFn: () => exportMyData() });
+}
+
+export function useDeleteMyAccount() {
+  return useMutation({ mutationFn: (password: string) => deleteMyAccount({ data: { password } }) });
+}
+
+export function useUpdateMyName() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => updateMyName({ data: { name } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["me"] }),
+  });
+}
+
+export function useSignOutEverywhere() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: () => signOutEverywhere(), onSuccess: () => qc.clear() });
+}
+
+export function useRequestPasswordReset() {
+  return useMutation({ mutationFn: (email: string) => requestPasswordReset({ data: { email } }) });
+}
+
+export function useResetPassword() {
+  return useMutation({ mutationFn: (data: { token: string; password: string }) => resetPassword({ data }) });
 }
 
 /** "Today · 4:30 PM", "Fri · 11:00 AM", or "Jun 12" for older dates. */

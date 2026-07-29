@@ -5,6 +5,9 @@ import { z } from "zod";
 import { db, ensureDb } from "@/db";
 import { conversations, messages, pros } from "@/db/schema";
 import { requireUser, type SessionUser } from "@/server/session";
+import { notify } from "@/server/notify";
+import { isBlockedEitherWay } from "@/server/blocks";
+import { allow, RATE_LIMITED_ERROR } from "@/server/rate-limit";
 
 async function assertParticipant(conversationId: string, user: SessionUser) {
   const [convo] = await db.select().from(conversations).where(eq(conversations.id, conversationId)).limit(1);
@@ -65,6 +68,7 @@ export const sendMessage = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const user = await requireUser();
     await ensureDb();
+    if (!allow("send-message", user.id, 60, 3600_000)) return { ok: false as const, error: RATE_LIMITED_ERROR };
     const now = new Date().toISOString();
 
     let conversationId = data.conversationId;
@@ -85,8 +89,24 @@ export const sendMessage = createServerFn({ method: "POST" })
       }
     }
 
+    // Resolve the other participant for block checks + notification.
+    const [convo] = await db.select().from(conversations).where(eq(conversations.id, conversationId)).limit(1);
+    const [proRow] = await db.select({ userId: pros.userId, name: pros.name }).from(pros).where(eq(pros.id, convo!.proId)).limit(1);
+    const otherUserId = user.id === convo!.customerId ? proRow?.userId ?? null : convo!.customerId;
+    if (otherUserId && (await isBlockedEitherWay(user.id, otherUserId))) {
+      return { ok: false as const, error: "You can't message this person." };
+    }
+
     const message = { id: nanoid(), conversationId, senderId: user.id, body: data.body, createdAt: now };
     await db.insert(messages).values(message);
     await db.update(conversations).set({ lastMessageAt: now }).where(eq(conversations.id, conversationId));
+    if (otherUserId) {
+      await notify(otherUserId, {
+        type: "message",
+        title: `Message from ${user.name}`,
+        body: data.body.slice(0, 80),
+        href: "/app/messages",
+      });
+    }
     return { ok: true as const, message };
   });

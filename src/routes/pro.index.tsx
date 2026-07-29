@@ -2,11 +2,24 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/boujee/AppShell";
 import { ProTabs } from "@/components/boujee/ProTabs";
 import { Bars } from "@/components/boujee/Sparkline";
-import { useProDashboard, useSetBookingStatus } from "@/lib/api";
+import { useProDashboard, useSetBookingStatus, useUnreadCount } from "@/lib/api";
 import { Bell, ArrowUpRight, Loader2, Check } from "lucide-react";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/pro/")({ component: ProHome });
+
+function ProBell() {
+  const { data: unread } = useUnreadCount();
+  return (
+    <Link to="/app/notifications" aria-label="Notifications" className="h-10 w-10 grid place-items-center rounded-full border border-white/20 relative text-white">
+      <Bell className="h-4 w-4" />
+      {(unread ?? 0) > 0 && (
+        <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-gold text-ink text-[9px] font-semibold grid place-items-center">
+          {unread! > 9 ? "9+" : unread}
+        </span>
+      )}
+    </Link>
+  );
+}
 
 const fmtTime = (iso: string) =>
   new Date(iso).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
@@ -38,13 +51,7 @@ function ProHome() {
             <div className="font-display text-lg leading-tight">{profile?.name}</div>
           </div>
         </div>
-        <button
-          onClick={() => toast("You're all caught up", { description: "New booking requests and client messages will show up here." })}
-          aria-label="Notifications"
-          className="h-10 w-10 grid place-items-center rounded-full border border-white/20"
-        >
-          <Bell className="h-4 w-4" />
-        </button>
+        <ProBell />
       </header>
 
       <div className="px-5 mt-3">

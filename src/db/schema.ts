@@ -6,6 +6,7 @@ export const users = sqliteTable("users", {
   passwordHash: text("password_hash").notNull(),
   name: text("name").notNull(),
   role: text("role", { enum: ["customer", "pro", "admin"] }).notNull().default("customer"),
+  status: text("status", { enum: ["active", "suspended", "deleted"] }).notNull().default("active"),
   avatar: text("avatar"),
   createdAt: text("created_at").notNull(),
 });
@@ -99,7 +100,88 @@ export const favorites = sqliteTable(
   (t) => [primaryKey({ columns: [t.customerId, t.proId] })],
 );
 
+export const notifications = sqliteTable("notifications", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: text("type").notNull(), // booking | message | review | verification | dispute | system
+  title: text("title").notNull(),
+  body: text("body"),
+  href: text("href"), // in-app destination
+  readAt: text("read_at"),
+  createdAt: text("created_at").notNull(),
+});
+
+export const disputes = sqliteTable("disputes", {
+  id: text("id").primaryKey(),
+  bookingId: text("booking_id").notNull().references(() => bookings.id),
+  customerId: text("customer_id").notNull().references(() => users.id),
+  proId: text("pro_id").notNull().references(() => pros.id),
+  reason: text("reason").notNull(),
+  details: text("details").notNull(),
+  status: text("status", { enum: ["open", "resolved", "dismissed"] }).notNull().default("open"),
+  resolution: text("resolution"),
+  createdAt: text("created_at").notNull(),
+  resolvedAt: text("resolved_at"),
+});
+
+export const passwordResets = sqliteTable("password_resets", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  usedAt: text("used_at"),
+  createdAt: text("created_at").notNull(),
+});
+
+/** Weekly working hours; one row per pro per day-of-week (0=Sunday). */
+export const proHours = sqliteTable(
+  "pro_hours",
+  {
+    proId: text("pro_id").notNull().references(() => pros.id, { onDelete: "cascade" }),
+    dow: integer("dow").notNull(), // 0-6
+    enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+    startMin: integer("start_min").notNull().default(9 * 60),
+    endMin: integer("end_min").notNull().default(19 * 60),
+  },
+  (t) => [primaryKey({ columns: [t.proId, t.dow] })],
+);
+
+export const reports = sqliteTable("reports", {
+  id: text("id").primaryKey(),
+  reporterId: text("reporter_id").notNull().references(() => users.id),
+  targetType: text("target_type", { enum: ["pro", "user", "review", "message", "conversation"] }).notNull(),
+  targetId: text("target_id").notNull(),
+  reason: text("reason").notNull(),
+  details: text("details"),
+  status: text("status", { enum: ["open", "actioned", "dismissed"] }).notNull().default("open"),
+  createdAt: text("created_at").notNull(),
+});
+
+export const blocks = sqliteTable(
+  "blocks",
+  {
+    blockerId: text("blocker_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    blockedUserId: text("blocked_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.blockerId, t.blockedUserId] })],
+);
+
+export const auditLog = sqliteTable("audit_log", {
+  id: text("id").primaryKey(),
+  actorId: text("actor_id").notNull(),
+  action: text("action").notNull(),
+  targetType: text("target_type"),
+  targetId: text("target_id"),
+  meta: text("meta", { mode: "json" }).$type<Record<string, unknown>>(),
+  createdAt: text("created_at").notNull(),
+});
+
 export type User = typeof users.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
+export type Dispute = typeof disputes.$inferSelect;
+export type ProHours = typeof proHours.$inferSelect;
+export type Report = typeof reports.$inferSelect;
 export type Pro = typeof pros.$inferSelect;
 export type Service = typeof services.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;

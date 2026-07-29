@@ -74,7 +74,7 @@ function Me() {
           {[
             { i:CreditCard, l:"Payment methods", v:"", onClick: () => toast("Payments arrive at launch", { description: "Cards and Apple Pay activate once Stripe is connected." }) },
             { i:MapPin, l:"Saved addresses", v:"", onClick: () => toast("Address book coming soon", { description: "You can enter an address on each mobile booking for now." }) },
-            { i:Bell, l:"Notifications", v:"On", onClick: () => toast("Notifications are on", { description: "Fine-grained preferences are coming soon." }) },
+            { i:Bell, l:"Notifications", v:"", to:"/app/notifications" as const },
             { i:Heart, l:"Favorites", v:`${favorites?.length ?? 0}`, onClick: () => {
               const el = document.getElementById("favorites");
               if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -82,8 +82,8 @@ function Me() {
             } },
             { i:Gift, l:"Rewards", v:`${points.toLocaleString()} pts`, onClick: () => toast(`${points.toLocaleString()} points banked`, { description: "You earn 2 points per $1 spent. Redemptions open at launch." }) },
             { i:ShieldCheck, l:"Trust & safety", v:"", to:"/app/safety" as const },
-            { i:Shield, l:"Privacy & data", v:"", to:"/privacy" as const },
-            { i:Settings, l:"Account settings", v:"", onClick: () => toast("Account settings coming soon", { description: "Contact help@boujeebook.app to change your email or name." }) },
+            { i:Shield, l:"Privacy & data", v:"", to:"/app/account" as const },
+            { i:Settings, l:"Account settings", v:"", to:"/app/account" as const },
           ].map(r=>{const I=r.i;const inner=(<><I className="h-4 w-4 text-muted-foreground" /><span className="flex-1 text-sm">{r.l}</span>{r.v && <span className="text-[11px] text-muted-foreground">{r.v}</span>}<ChevronRight className="h-4 w-4 text-muted-foreground" /></>);return r.to ? (
             <Link key={r.l} to={r.to} className="w-full flex items-center gap-3 p-4 text-left">{inner}</Link>
           ) : (

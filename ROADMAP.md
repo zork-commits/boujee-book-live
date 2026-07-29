@@ -148,11 +148,20 @@ bare website wrappers (guideline 4.2 minimum functionality). The pragmatic path:
 
 ## 7. Recommended build order
 
-**Phase A — no external accounts needed (can build now):**
-in-app notifications feed · dispute persistence + admin queue · admin users/bookings tabs real ·
-account deletion + data export · rate limiting · security headers · session hardening ·
-password-reset token flow (email delivery stubbed until provider) · availability/working-hours model ·
-booking expiry · report/block (moderation base) · audit log · accessibility pass · remove demo hints in prod
+**Phase A — DONE (2026-07-29), all browser-verified:**
+✓ in-app notifications feed (fan-out on booking/cancel/confirm/review/message/dispute/verification; unread badges)
+✓ dispute persistence + admin resolution queue (customer notified with resolution note)
+✓ admin users tab (search, suspend/reinstate — suspension kills sessions + blocks login) and bookings tab (filter, force-cancel with both-sides notify)
+✓ account lifecycle: data export (JSON), account deletion (password-confirmed, PII anonymized, pro profile removed), sign-out-everywhere
+✓ password reset: tokenized (hashed, single-use, 15-min), no email enumeration, invalidates all sessions — email delivery stubbed to server log until a provider is wired
+✓ rate limiting: login/signup/reset/messages/bookings/disputes/reports (per-IP + per-account sliding windows)
+✓ security headers (CSP/HSTS prod-only; nosniff/frame-deny/referrer/permissions always) · session cap + purge · suspended/deleted checked on every request
+✓ availability: per-day working hours (Studio editor) + server-side conflict detection — double-booking is impossible; stale pending bookings auto-expire
+✓ report content (pro profiles, conversations) + block users + admin reports queue
+✓ audit log on all privileged actions (viewer in admin Settings)
+✓ demo-credential hint hidden in production builds
+
+Still stubbed inside Phase A scope: reset-link email delivery (needs provider — Phase B).
 
 **Phase B — needs your accounts/keys:**
 Stripe (payments, Connect payouts, Tax) · R2/S3 (uploads) · Resend/Postmark (email) ·

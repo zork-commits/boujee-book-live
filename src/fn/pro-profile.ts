@@ -3,8 +3,9 @@ import { eq, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { db, ensureDb } from "@/db";
-import { pros, services, users } from "@/db/schema";
+import { pros, services, users, proHours } from "@/db/schema";
 import { requireUser } from "@/server/session";
+import { notify } from "@/server/notify";
 
 export const CRAFTS = [
   { craft: "Barber", category: "barber" },
@@ -89,8 +90,45 @@ export const becomePro = createServerFn({ method: "POST" })
       inShop: data.inShop,
     });
     await db.insert(services).values(data.services.map((s) => ({ id: nanoid(), proId, ...s })));
+    await db.insert(proHours).values(
+      Array.from({ length: 7 }, (_, dow) => ({ proId, dow, enabled: true, startMin: 9 * 60, endMin: 19 * 60 })),
+    );
     await db.update(users).set({ role: "pro" }).where(eq(users.id, user.id));
+    await notify(user.id, {
+      type: "verification",
+      title: "Your studio is live",
+      body: "You can take bookings now. The verified badge appears once our team reviews your license.",
+      href: "/pro/profile",
+    });
     return { ok: true as const, proId, existing: false };
+  });
+
+export const getMyHours = createServerFn({ method: "GET" }).handler(async () => {
+  const user = await requireUser();
+  if (!user.proId) throw new Response("Not a pro account", { status: 403 });
+  return db.select().from(proHours).where(eq(proHours.proId, user.proId)).orderBy(proHours.dow);
+});
+
+export const updateHours = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      dow: z.number().int().min(0).max(6),
+      enabled: z.boolean(),
+      startMin: z.number().int().min(0).max(1439),
+      endMin: z.number().int().min(0).max(1440),
+    }).refine((h) => h.endMin > h.startMin, "End must be after start"),
+  )
+  .handler(async ({ data }) => {
+    const user = await requireUser();
+    if (!user.proId) throw new Response("Not a pro account", { status: 403 });
+    await db
+      .insert(proHours)
+      .values({ proId: user.proId, ...data })
+      .onConflictDoUpdate({
+        target: [proHours.proId, proHours.dow],
+        set: { enabled: data.enabled, startMin: data.startMin, endMin: data.endMin },
+      });
+    return { ok: true as const };
   });
 
 export const updateProProfile = createServerFn({ method: "POST" })

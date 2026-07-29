@@ -1,8 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/boujee/AppShell";
 import { getPro } from "@/fn/pros";
-import { useFavorites, useToggleFavorite, fmtWhen } from "@/lib/api";
-import { ChevronLeft, Star, MapPin, BadgeCheck, MessageSquare, Heart, Share2, Award } from "lucide-react";
+import { useFavorites, useToggleFavorite, useReportContent, fmtWhen } from "@/lib/api";
+import { ChevronLeft, Star, MapPin, BadgeCheck, MessageSquare, Heart, Share2, Award, Flag } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/p/$id")({
@@ -134,12 +134,35 @@ function ProfilePage() {
             <div key={c} className="flex items-center gap-2 text-xs"><Award className="h-3.5 w-3.5 text-gold" />{c}</div>
           ))}
         </div>
+        <ReportPro proId={pro.id} proName={pro.name} />
       </section>
 
-      <div className="sticky bottom-0 z-30 mt-auto border-t border-border bg-background/95 backdrop-blur-xl px-5 py-3 flex items-center gap-2">
-        <Link to="/app/messages" search={{ to: pro.id }} className="h-12 w-12 rounded-full border border-border grid place-items-center"><MessageSquare className="h-4 w-4" /></Link>
-        <Link to="/app/book" search={{ pro: pro.id }} className="flex-1 h-12 rounded-full bg-ink text-white grid place-items-center font-medium text-sm">Book — from ${pro.price}</Link>
-      </div>
+      <ProFooter pro={pro} />
     </AppShell>
+  );
+}
+
+function ReportPro({ proId, proName }: { proId: string; proName: string }) {
+  const report = useReportContent();
+  return (
+    <button
+      onClick={async () => {
+        const res = await report.mutateAsync({ targetType: "pro", targetId: proId, reason: "Reported from profile" });
+        toast(res.ok ? "Report received" : res.error, res.ok ? { description: `Our trust team will review ${proName}'s profile.` } : undefined);
+      }}
+      disabled={report.isPending}
+      className="mt-6 inline-flex items-center gap-1.5 text-[11px] text-muted-foreground disabled:opacity-50"
+    >
+      <Flag className="h-3 w-3" />Report this profile
+    </button>
+  );
+}
+
+function ProFooter({ pro }: { pro: { id: string; price: number } }) {
+  return (
+    <div className="sticky bottom-0 z-30 mt-auto border-t border-border bg-background/95 backdrop-blur-xl px-5 py-3 flex items-center gap-2">
+      <Link to="/app/messages" search={{ to: pro.id }} className="h-12 w-12 rounded-full border border-border grid place-items-center" aria-label="Message pro"><MessageSquare className="h-4 w-4" /></Link>
+      <Link to="/app/book" search={{ pro: pro.id }} className="flex-1 h-12 rounded-full bg-ink text-white grid place-items-center font-medium text-sm">Book — from ${pro.price}</Link>
+    </div>
   );
 }

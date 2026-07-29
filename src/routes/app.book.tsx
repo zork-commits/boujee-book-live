@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/boujee/AppShell";
 import { getPro } from "@/fn/pros";
-import { useCreateBooking } from "@/lib/api";
+import { useCreateBooking, useBookableSlots } from "@/lib/api";
 import { ChevronLeft, MapPin, Check, CreditCard, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/app/book")({
@@ -39,7 +39,11 @@ function Booking() {
     const d = new Date(); d.setDate(d.getDate()+i);
     return { iso: d.toISOString().slice(0,10), day: d.toLocaleDateString("en",{weekday:"short"}), num: d.getDate() };
   });
-  const times = ["09:00","10:30","12:00","13:30","15:00","16:30","18:00","19:30"];
+  // Real availability: the pro's working hours minus existing bookings.
+  const { data: slotData, isLoading: slotsLoading } = useBookableSlots(
+    date && svc ? { proId: pro.id, serviceId: svc.id, date } : null,
+  );
+  const times = slotData?.slots ?? [];
 
   const canContinue = [!!serviceId, !!date, !!time, true, true][step];
 
@@ -94,7 +98,7 @@ function Booking() {
         {step===1 && (
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
             {dates.map(d=>(
-              <button key={d.iso} onClick={()=>setDate(d.iso)} className={`shrink-0 w-16 py-4 rounded-2xl border text-center ${date===d.iso?"border-ink bg-ink text-white":"border-border"}`}>
+              <button key={d.iso} onClick={()=>{ setDate(d.iso); setTime(""); }} className={`shrink-0 w-16 py-4 rounded-2xl border text-center ${date===d.iso?"border-ink bg-ink text-white":"border-border"}`}>
                 <div className="text-[10px] uppercase tracking-widest opacity-70">{d.day}</div>
                 <div className="font-display text-2xl mt-1">{d.num}</div>
               </button>
@@ -102,10 +106,18 @@ function Booking() {
           </div>
         )}
         {step===2 && (
-          <div className="grid grid-cols-3 gap-2">
-            {times.map(t=>(
-              <button key={t} onClick={()=>setTime(t)} className={`py-3 rounded-xl border text-sm ${time===t?"border-ink bg-ink text-white":"border-border"}`}>{t}</button>
-            ))}
+          <div>
+            {slotsLoading && <div className="py-8 grid place-items-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin" /></div>}
+            {!slotsLoading && times.length === 0 && (
+              <div className="py-8 text-center text-sm text-muted-foreground">
+                {pro.name.split(" ")[0]} is fully booked or closed that day — try another date.
+              </div>
+            )}
+            <div className="grid grid-cols-3 gap-2">
+              {times.map(t=>(
+                <button key={t} onClick={()=>setTime(t)} className={`py-3 rounded-xl border text-sm ${time===t?"border-ink bg-ink text-white":"border-border"}`}>{t}</button>
+              ))}
+            </div>
           </div>
         )}
         {step===3 && (
