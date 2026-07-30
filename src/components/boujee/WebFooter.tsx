@@ -21,7 +21,6 @@ export function WebFooter() {
           <div className="text-white text-xs uppercase tracking-widest mb-4">Company</div>
           <ul className="space-y-2 text-sm">
             <li><Link to="/about">About</Link></li>
-            <li><Link to="/careers">Careers</Link></li>
             <li><Link to="/contact">Contact</Link></li>
             <li><Link to="/investors">Investors</Link></li>
           </ul>

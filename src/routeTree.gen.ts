@@ -18,7 +18,6 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -91,11 +90,6 @@ const InvestorsRoute = InvestorsRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CareersRoute = CareersRouteImport.update({
-  id: '/careers',
-  path: '/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -246,7 +240,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
-  '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/investors': typeof InvestorsRoute
   '/pricing': typeof PricingRoute
@@ -285,7 +278,6 @@ export interface FileRoutesByTo {
   '/accessibility': typeof AccessibilityRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
-  '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/investors': typeof InvestorsRoute
   '/pricing': typeof PricingRoute
@@ -325,7 +317,6 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
-  '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
   '/investors': typeof InvestorsRoute
   '/pricing': typeof PricingRoute
@@ -367,7 +358,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/auth'
-    | '/careers'
     | '/contact'
     | '/investors'
     | '/pricing'
@@ -406,7 +396,6 @@ export interface FileRouteTypes {
     | '/accessibility'
     | '/admin'
     | '/auth'
-    | '/careers'
     | '/contact'
     | '/investors'
     | '/pricing'
@@ -445,7 +434,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/auth'
-    | '/careers'
     | '/contact'
     | '/investors'
     | '/pricing'
@@ -486,7 +474,6 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
-  CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
   InvestorsRoute: typeof InvestorsRoute
   PricingRoute: typeof PricingRoute
@@ -561,13 +548,6 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/careers': {
-      id: '/careers'
-      path: '/careers'
-      fullPath: '/careers'
-      preLoaderRoute: typeof CareersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -836,7 +816,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
-  CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
   InvestorsRoute: InvestorsRoute,
   PricingRoute: PricingRoute,
