@@ -27,7 +27,7 @@ and the order to build it. P0 = launch blockers. P1 = launch week. P2 = post-lau
 - [ ] Address entry for mobile bookings (field exists in DB, no UI) (P1).
 - [ ] Real availability calendar — pros' working hours + conflict detection so double-booking is impossible (P1; today any slot can be picked).
 - [ ] Saved payment methods / Apple Pay (P1, comes with Stripe).
-- [ ] Real GPS tracking (P2 — needs native app + pro location sharing).
+- [x] ~~Real GPS tracking~~ DONE: two-way live tracking (customer ↔ pro) with Leaflet/OSM map, journey statuses (en_route/arrived) + notifications, distance/ETA, ephemeral location storage (deleted at completion). Browser geolocation now; carries into the Capacitor app with native background location later.
 - [ ] Real AI concierge (P2 — wire to Claude API; current one is canned).
 
 ### Pro / vendor (P0 unless noted)

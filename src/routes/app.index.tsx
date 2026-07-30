@@ -86,7 +86,7 @@ function Home() {
                 </div>
                 <div className="mt-4 flex items-end justify-between">
                   <div>
-                    <div className="text-[10px] uppercase tracking-widest text-white/50">{a.booking.status}</div>
+                    <div className="text-[10px] uppercase tracking-widest text-white/50">{a.booking.status.replace("_", " ")}</div>
                     <div className="font-display text-lg">{fmtWhen(a.booking.scheduledAt)}</div>
                   </div>
                   <span className="text-[10px] text-gold">Track →</span>

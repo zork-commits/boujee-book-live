@@ -29,12 +29,17 @@ export function WebFooter() {
         <div>
           <div className="text-white text-xs uppercase tracking-widest mb-4">Legal</div>
           <ul className="space-y-2 text-sm">
-            <li><Link to="/privacy">Privacy</Link></li>
-            <li><Link to="/terms">Terms</Link></li>
+            <li><Link to="/privacy">Privacy Policy</Link></li>
+            <li><Link to="/terms">Terms of Service</Link></li>
+            <li><Link to="/accessibility">Accessibility</Link></li>
+            <li><a href="/privacy#ccpa">Do Not Sell or Share My Personal Information</a></li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 py-6 text-center text-xs text-white/40">© {new Date().getFullYear()} Boujee Book Technologies, Inc. All rights reserved.</div>
+      <div className="border-t border-white/10 py-6 px-6 text-center text-xs text-white/40 space-y-1">
+        <div>© {new Date().getFullYear()} Boujee Book Technologies, Inc. All rights reserved.</div>
+        <div>68 Jay Street, Brooklyn, NY 11201 · help@boujeebook.app · Map data © OpenStreetMap contributors</div>
+      </div>
     </footer>
   );
 }
