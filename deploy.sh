@@ -2,16 +2,17 @@
 set -e
 
 echo "=== Node.js ==="
-if ! command -v node >/dev/null || [ "$(node -v | cut -d. -f1 | tr -d v)" -lt 20 ]; then
+if ! command -v node >/dev/null || [ "$(node -v | cut -d. -f1 | tr -d v)" -lt 22 ]; then
   curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
   apt-get install -y nodejs
 fi
+node -v
 
 echo "=== app code ==="
 rm -rf /opt/boujee-book
 git clone https://github.com/zork-commits/boujee-book-live.git /opt/boujee-book
 cd /opt/boujee-book
-npm ci --no-audit --no-fund
+npm install --no-audit --no-fund
 npx vite build
 
 mkdir -p /opt/boujee-book-data
