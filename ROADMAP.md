@@ -171,4 +171,5 @@ Twilio (SMS, optional) · Persona/Checkr (ID + background checks) · Turso (prod
 Capacitor shell + push · store assets · App Review checklist above · submit
 
 **Phase D — polish/scale:**
-websockets messaging · real AI concierge · promo tools · pen test · staging · analytics
+websockets messaging · real AI concierge · promo tools · pen test · staging · analytics ·
+per-pro timezones for working hours (currently pinned to America/Los_Angeles via TZ env in serve.mjs — server-local Date math breaks on UTC boxes otherwise)

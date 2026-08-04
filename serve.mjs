@@ -3,6 +3,12 @@
 // handler at dist/server/server.js — this bridges it to a real Node http server
 // AND serves the static client assets (Cloudflare's platform does this part
 // automatically for Workers; a plain Node process has to do it itself).
+
+// Working-hours math currently uses server-local time; datacenter boxes run UTC,
+// which shifts every slot by 7-8h vs users' clocks. Pin the business timezone
+// until per-pro timezones ship (see ROADMAP). Runs before any request handling.
+if (!process.env.TZ) process.env.TZ = "America/Los_Angeles";
+
 import { createServerAdapter } from "@whatwg-node/server";
 import { createServer } from "node:http";
 import { createReadStream, existsSync, statSync } from "node:fs";
