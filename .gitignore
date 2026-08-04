@@ -31,3 +31,6 @@ dist-ssr
 *.sln
 *.sw?
 data/
+
+# local test artifacts
+/tmp
