@@ -31,6 +31,7 @@ Environment=PORT=8080
 Environment=HOST=0.0.0.0
 Environment=DATABASE_URL=file:/opt/boujee-book-data/boujee.db
 Environment=SEED_DEMO=1
+Environment=COOKIE_SECURE=0
 ExecStart=/usr/bin/node /opt/boujee-book/serve.mjs
 Restart=always
 RestartSec=3
@@ -44,8 +45,13 @@ systemctl restart boujee-book
 
 echo "=== nginx ==="
 if ! command -v nginx >/dev/null; then
-  apt-get update -qq && apt-get install -y nginx
+  # unattended-upgrades may briefly hold the dpkg lock right after boot — wait it out
+  for i in $(seq 1 30); do
+    if apt-get install -y nginx 2>/dev/null; then break; fi
+    echo "waiting for apt lock ($i/30)..."; sleep 10
+  done
 fi
+command -v nginx >/dev/null || { echo "nginx failed to install"; exit 1; }
 
 cat > /etc/nginx/sites-available/boujeebook <<'NGINXEOF'
 server {

@@ -40,7 +40,9 @@ export async function createSession(userId: string): Promise<void> {
   setCookie(SESSION_COOKIE, id, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    // Secure cookies require HTTPS. COOKIE_SECURE=0 opts out for plain-http
+    // previews (the demo droplet before TLS is set up) — remove once HTTPS is live.
+    secure: process.env.NODE_ENV === "production" && process.env.COOKIE_SECURE !== "0",
     path: "/",
     maxAge: SESSION_DAYS * 86400,
   });
