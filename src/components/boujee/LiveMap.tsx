@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { Map as LeafletMap, Marker, LatLngBoundsExpression } from "leaflet";
-import "leaflet/dist/leaflet.css";
+// Deliberately NOT a static top-level import: leaflet.css must never enter the
+// SSR/server bundle graph (only src/components — client-loaded via the effect below).
 
 export type MapPoint = {
   key: string;
@@ -28,7 +29,7 @@ export function LiveMap({ points, className }: { points: MapPoint[]; className?:
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const L = await import("leaflet");
+      const [L] = await Promise.all([import("leaflet"), import("leaflet/dist/leaflet.css")]);
       if (cancelled || !containerRef.current || mapRef.current) return;
       const map = L.map(containerRef.current, {
         zoomControl: false,
