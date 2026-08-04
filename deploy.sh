@@ -85,6 +85,43 @@ rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl restart nginx
 
+echo "=== auto-deploy timer ==="
+cat > /opt/boujee-book-update.sh <<'UPDEOF'
+#!/bin/bash
+set -e
+cd /opt/boujee-book
+git fetch origin main --quiet
+LOCAL=$(git rev-parse HEAD); REMOTE=$(git rev-parse origin/main)
+[ "$LOCAL" = "$REMOTE" ] && exit 0
+echo "updating $LOCAL -> $REMOTE"
+git reset --hard origin/main --quiet
+npm install --no-audit --no-fund
+npx vite build
+systemctl restart boujee-book
+echo "deployed $REMOTE"
+UPDEOF
+chmod +x /opt/boujee-book-update.sh
+
+cat > /etc/systemd/system/boujee-book-update.service <<'USVCEOF'
+[Unit]
+Description=Boujee Book auto-deploy check
+[Service]
+Type=oneshot
+ExecStart=/opt/boujee-book-update.sh
+USVCEOF
+
+cat > /etc/systemd/system/boujee-book-update.timer <<'UTMREOF'
+[Unit]
+Description=Boujee Book auto-deploy every 2 minutes
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+[Install]
+WantedBy=timers.target
+UTMREOF
+systemctl daemon-reload
+systemctl enable --now boujee-book-update.timer
+
 sleep 2
 echo ""
 echo "=== status ==="
