@@ -12,4 +12,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    // leaflet is browser-only (touches `window`) and is only ever loaded via a
+    // client-gated dynamic import (see LiveMap.tsx). The SSR/server build must
+    // never try to statically resolve it — externalize it there entirely.
+    ssr: { external: ["leaflet"] },
+  },
 });
